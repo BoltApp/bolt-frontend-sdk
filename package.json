@@ -2,7 +2,7 @@
   "name": "@boltpay/bolt-js",
   "private": false,
   "description": "BoltJS connects your frontend to the Bolt ecosystem",
-  "version": "0.0.7",
+  "version": "0.0.8-beta.1",
   "license": "MIT",
   "author": "Bolt",
   "module": "./build/dist/bolt-charge.js",
@@ -30,7 +30,7 @@
     "format:scripts": "prettier . --write",
     "format:styles": "stylelint ./**/*.{css,scss} --fix",
     "format": "npm run format:scripts && npm run format:styles",
-    "prepare": "husky && echo 'npx lint-staged' > .husky/pre-commit && git add .husky/pre-commit",
+    "prepare": "npm run build",
     "uninstall-husky": "npm uninstall husky --no-save && git config --unset core.hooksPath && npx rimraf .husky"
   },
   "devDependencies": {
@@ -77,5 +77,14 @@
   "bugs": {
     "url": "https://github.com/BoltApp/bolt-frontend-sdk/issues"
   },
-  "homepage": "https://github.com/BoltApp/bolt-frontend-sdk#readme"
+  "homepage": "https://github.com/BoltApp/bolt-frontend-sdk#readme",
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "vitest related --run"
+    ],
+    "*.{css,scss}": [
+      "stylelint --fix"
+    ]
+  }
 }

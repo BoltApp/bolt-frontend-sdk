@@ -78,9 +78,9 @@ yarn add @boltpay/bolt-js
 **Example Usage:**
 
 ```ts
-import Bolt from '@boltpay/bolt-js'
+import { Charge } from '@boltpay/bolt-js'
 
-Bolt.charge.checkout('...').then(transaction => {
+Charge.checkout('...').then(transaction => {
   console.log('Transaction Successful:', transaction)
 })
 ```
