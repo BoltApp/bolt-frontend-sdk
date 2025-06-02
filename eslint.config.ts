@@ -1,9 +1,9 @@
-import eslint from "@eslint/js";
-import type { Linter } from "eslint";
-import eslintConfigPrettier from "eslint-config-prettier";
-import prettier from "eslint-plugin-prettier";
-import globals from "globals";
-import tseslint from "typescript-eslint";
+import eslint from '@eslint/js'
+import type { Linter } from 'eslint'
+import eslintConfigPrettier from 'eslint-config-prettier'
+import prettier from 'eslint-plugin-prettier'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 export default [
   eslint.configs.recommended,
@@ -11,12 +11,12 @@ export default [
   eslintConfigPrettier,
   {
     ignores: [
-      "**/.history",
-      "**/.husky",
-      "**/.vscode",
-      "**/coverage",
-      "**/dist",
-      "**/node_modules",
+      '**/.history',
+      '**/.husky',
+      '**/.vscode',
+      '**/coverage',
+      '**/dist',
+      '**/node_modules',
     ],
   },
   {
@@ -32,8 +32,13 @@ export default [
       parser: tseslint.parser,
     },
     rules: {
-      "prettier/prettier": "error",
-      "@typescript-eslint/no-explicit-any": "off",
+      'prettier/prettier': [
+        'error',
+        {
+          singleQuote: true,
+          semi: false,
+        },
+      ],
     },
   },
-] satisfies Linter.Config[];
+] satisfies Linter.Config[]

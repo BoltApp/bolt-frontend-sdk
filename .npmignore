@@ -1,0 +1,15 @@
+# Development files
+src/
+.husky/
+testbed/
+eslint.config.ts
+.lintstagedrc
+.prettierrc
+.prettierignore
+.stylelintrc
+.stylelintignore
+dts-bundle-generator.config.ts
+tsconfig.jsonvite.config.ts
+
+# Keep build files
+!build/

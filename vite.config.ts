@@ -1,21 +1,21 @@
 /// <reference types="vitest" />
-import path from "path";
-import { defineConfig } from "vite";
+import path from 'path'
+import { defineConfig } from 'vite'
 
 const fileName = {
-  es: `bolt-charge-sdk.js`,
-  iife: `bolt-charge-sdk.iife.js`,
-};
+  es: `bolt.js`,
+  iife: `bolt.iife.js`,
+}
 
-const formats = Object.keys(fileName) as Array<keyof typeof fileName>;
+const formats = Object.keys(fileName) as Array<keyof typeof fileName>
 
 export default defineConfig({
-  base: "./",
+  base: './',
   build: {
-    outDir: "./build/dist",
+    outDir: './build/dist',
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
-      name: "BoltSDK",
+      entry: path.resolve(__dirname, 'src/index.ts'),
+      name: 'BoltSDK',
       formats,
       fileName: format => fileName[format],
     },
@@ -29,8 +29,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
-      "@@": path.resolve(__dirname),
+      '@': path.resolve(__dirname, 'src'),
+      '@@': path.resolve(__dirname),
     },
   },
-});
+})

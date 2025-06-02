@@ -2,8 +2,6 @@
 
 <div align="center" style="display:flex;justify-content:center;margin-bottom:20px">
   <img src="https://res.cloudinary.com/dugcmkito/image/upload/v1744983998/bolt_accounts_2x_6c96bccd82.png" alt="Bolt Charge Hero" height="250px">
-
-  <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" height="250px" />
 </div>
 
 <br>
@@ -49,19 +47,42 @@ This open source package is a light-weight Typescript SDK.
 
 ## 📦 Installation
 
-_Stub_
+The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https://pnpm.io/), [bun](https://bun.sh/) or [yarn](https://classic.yarnpkg.com/en/) package managers.
+
+### NPM
+
+```bash
+npm add @boltpay/bolt-js
+```
+
+### PNPM
+
+```bash
+pnpm add @boltpay/bolt-js
+```
+
+### Bun
+
+```bash
+bun add @boltpay/bolt-js
+```
+
+### Yarn
+
+```bash
+yarn add @boltpay/bolt-js
+```
 
 ## 🔧 Quick Start
-
-_Stub_
-<br>
 
 **Example Usage:**
 
 ```ts
-import BoltSDK from '@boltpay/charge'
+import { Charge } from '@boltpay/bolt-js'
 
-BoltSDK.charge.openCheckout('...').then(data => {})
+Charge.checkout('...').then(transaction => {
+  console.log('Transaction Successful:', transaction)
+})
 ```
 
 ## 📚 Documentation

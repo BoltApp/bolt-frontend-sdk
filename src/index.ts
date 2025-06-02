@@ -1,3 +1,1 @@
-import "./style.css";
-
-export { BoltSDK } from "./main";
+export { Charge } from './charge'
