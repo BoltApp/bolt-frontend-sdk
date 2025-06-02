@@ -7,6 +7,9 @@
   "author": "Bolt",
   "module": "./build/dist/bolt-charge.js",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": {
       "import": "./build/dist/bolt.js",
