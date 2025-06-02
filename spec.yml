@@ -1,0 +1,482 @@
+openapi: 3.0.0
+info:
+  title: Subscriptions API
+  version: v1
+  description: API for managing subscriptions and products.
+servers:
+  - url: https://api.bolt.com
+    description: The Production URL (Live Data).
+  - url: https://api-sandbox.bolt.com
+    description: The Sandbox URL (Test Data).
+  - url: https://api-staging.bolt.com
+    description: The Staging URL (Staged Data).
+security:
+  - X-API-Key: []
+  - X-Publishable-Key: []
+paths:
+  /v1/subscriptions/products:
+    post:
+      operationId: createProduct
+      summary: Create a product
+      description: Creates a new product with associated plans.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - brand
+                - sku
+                - plans
+              properties:
+                name:
+                  type: string
+                  description: Name of the product.
+                  example: "Bolt Subscription Product"
+                description:
+                  type: string
+                  description: Description of the product.
+                  example: "This is a subscription product."
+                brand:
+                  type: string
+                  description: Brand of the product.
+                  example: "Bolt"
+                sku:
+                  type: string
+                  description: SKU of the product.
+                  example: "BOLT-12345"
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: URL
+                  description: Array of image URLs for the product.
+                  example:
+                    - "https://example.com/image1.jpg"
+                    - "https://example.com/image2.jpg"
+                plans:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - name
+                      - sku
+                      - frequency
+                      - frequency_unit
+                      - unit_price
+                    properties:
+                      sku:
+                        type: string
+                        description: SKU of the plan.
+                        example: "BOLT-PLAN-12345"
+                      name:
+                        type: string
+                        description: Name of the plan.
+                        example: "Monthly Subscription"
+                      frequency:
+                        type: integer
+                        description: Frequency of the plan.
+                        example: 1
+                      frequency_unit:
+                        type: string
+                        enum:
+                          - week
+                          - month
+                          - year
+                        description: Unit of frequency (e.g., hour, week, month).
+                        example: "month"
+                      unit_price:
+                        type: integer
+                        description: Unit price of the plan in cents.
+                        example: 1999
+                      images:
+                        type: array
+                        items:
+                          type: string
+                          format: URL
+                        description: Array of image URLs for the plan.
+                        example:
+                          - "https://example.com/plan_image1.jpg"
+                          - "https://example.com/plan_image2.jpg"
+      responses:
+        "200":
+          description: Product created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  product:
+                    $ref: "#/components/schemas/Product"
+        "400":
+          description: Bad request.
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+    get:
+      operationId: listProducts
+      summary: Get all products
+      description: Retrieves a list of all products.
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      responses:
+        "200":
+          description: List of products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Product not found.
+  /v1/subscriptions/products/{productId}:
+    get:
+      operationId: getProduct
+      summary: Get a product
+      description: Retrieves a product by its ID.
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      parameters:
+        - in: path
+          name: productId
+          schema:
+            type: integer
+          required: true
+          description: ID of the product to retrieve.
+      responses:
+        "200":
+          description: Product details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Product not found.
+    # delete:
+    #   operationId: deleteProduct
+    #   summary: Delete a product
+    #   description: Soft deletes a product by its ID. This will cancel all active subscriptions for the product plans.
+    #   security:
+    #     - X-API-Key: []
+    #     - X-Publishable-Key: []
+    #   parameters:
+    #     - in: path
+    #       name: productId
+    #       schema:
+    #         type: integer
+    #       required: true
+    #       description: ID of the product to delete.
+    #   responses:
+    #     '200':
+    #       description: Product deleted successfully.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: '#/components/schemas/Success'
+    #     '401':
+    #       description: Unauthorized - Invalid or missing API key.
+    #     '404':
+    #       description: Product not found.
+  /v1/subscriptions/{subscriptionId}/cancel:
+    post:
+      operationId: cancelSubscription
+      summary: Cancel a subscription
+      description: Cancels a subscription by its ID.
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      parameters:
+        - in: path
+          name: subscriptionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the subscription to cancel.
+      requestBody:
+        description: Empty body for cancellation.
+        content: {}
+      responses:
+        "200":
+          description: Subscription cancelled successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Subscription not found.
+  /v1/subscriptions/{subscriptionId}:
+    get:
+      operationId: getSubscription
+      summary: Get a subscription
+      description: Retrieves a subscription by its ID.
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      parameters:
+        - in: path
+          name: subscriptionId
+          schema:
+            type: integer
+          required: true
+          description: ID of the subscription to retrieve.
+      responses:
+        "200":
+          description: Subscription details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Subscription not found.
+  /v1/subscriptions:
+    get:
+      operationId: listSubscriptions
+      summary: Get all subscriptions
+      description: Retrieves a list of all subscriptions.
+      parameters:
+        - in: query
+          name: customer_ids
+          schema:
+            type: string
+          description: Comma-separated list of customer IDs to filter subscriptions.
+          required: false
+        - in: query
+          name: emails
+          schema:
+            type: string
+          description: Comma-separated list of email addresses to filter subscriptions.
+          required: false
+        - in: query
+          name: product_ids
+          schema:
+            type: string
+          description: Comma-separated list of product IDs to filter subscriptions.
+          required: false
+        - in: query
+          name: plan_ids
+          schema:
+            type: string
+          description: Comma-separated list of plan IDs to filter subscriptions.
+          required: false
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      responses:
+        "200":
+          description: List of subscriptions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subscription"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Subscription not found.
+  /v1/subscriptions/orders:
+    get:
+      operationId: listSubscriptionOrders
+      summary: Get all subscription orders
+      description: Retrieves a list of all subscription orders.
+      parameters:
+        - in: query
+          name: subscription_ids
+          schema:
+            type: string
+          description: Comma-separated list of subscription IDs to filter orders.
+          required: false
+      security:
+        - X-API-Key: []
+        - X-Publishable-Key: []
+      responses:
+        "200":
+          description: List of subscription orders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubscriptionOrder"
+        "401":
+          description: Unauthorized - Invalid or missing API key.
+        "404":
+          description: Orders not found.
+components:
+  securitySchemes:
+    X-API-Key:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    X-Publishable-Key:
+      type: apiKey
+      in: header
+      name: X-Publishable-Key
+  schemas:
+    Plan:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12345
+        name:
+          type: string
+          description: Name of the plan.
+          example: "Monthly Subscription"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        frequency:
+          type: integer
+          format: int64
+          example: 1
+        product_id:
+          type: integer
+          format: int64
+          example: 12345
+        frequency_unit:
+          type: string
+          description: Unit of frequency (e.g., hour, week, month).
+          enum:
+            - week
+            - month
+            - year
+          example: "month"
+        unit_price:
+          type: integer
+          format: int64
+          description: Unit price of the plan in cents.
+          example: 1999
+        images:
+          type: array
+          items:
+            type: string
+          example:
+            - "https://example.com/plan_image1.jpg"
+            - "https://example.com/plan_image2.jpg"
+        checkout_link:
+          type: string
+          description: Checkout link for the plan.
+          example: "https://your_site.c.bolt.com/g?merchant_product_id=37&merchant_variant_id=67&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f1195"
+    Product:
+      type: object
+      description: Product object.
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12345
+        name:
+          type: string
+          description: Name of the product.
+          example: "Bolt Subscription Product"
+        description:
+          type: string
+          description: Description of the product.
+          example: "This is a subscription product."
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        plans:
+          type: array
+          items:
+            $ref: "#/components/schemas/Plan"
+        images:
+          type: array
+          items:
+            type: string
+            format: URL
+          description: Array of image URLs for the product.
+          example:
+            - "https://example.com/image1.jpg"
+            - "https://example.com/image2.jpg"
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        consumer_id:
+          type: integer
+          format: int64
+        subscription_plan_id:
+          type: integer
+          format: int64
+        quantity:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - scheduled
+            - active
+            - canceled
+          example: "active"
+        plan:
+          $ref: "#/components/schemas/Plan"
+    SubscriptionOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        subscription_id:
+          type: integer
+          format: int64
+        order_id:
+          type: integer
+          format: int64
+        placement_time:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+            - scheduled
+            - active
+            - canceled
+          example: "active"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
