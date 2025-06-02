@@ -1,9 +1,0 @@
-#bolt-iframe-shell iframe {
-  border-width: 0;
-  height: 100vh;
-  inset: 0;
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  z-index: 9999999999;
-}
