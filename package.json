@@ -1,15 +1,19 @@
 {
-  "name": "@boltpay/bolt-sdk",
-  "private": true,
-  "version": "0.0.5",
-  "module": "./dist/bolt-charge.js",
+  "name": "@boltpay/bolt-js",
+  "private": false,
+  "description": "BoltJS connects your frontend to the Bolt ecosystem",
+  "version": "0.0.7",
+  "license": "MIT",
+  "author": "Bolt",
+  "module": "./build/dist/bolt-charge.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/bolt-charge.js"
+      "import": "./build/dist/bolt.js",
+      "types": "./build/dist/index.d.ts"
     },
     "./dist/": {
-      "import": "./dist/"
+      "import": "./build/dist/"
     }
   },
   "types": "./dist/index.d.ts",
@@ -52,5 +56,23 @@
     "typescript-eslint": "^8.25.0",
     "vite": "^6.2.0",
     "vitest": "^3.0.7"
-  }
+  },
+  "keywords": [
+    "bolt",
+    "bolt-js",
+    "boltpay",
+    "ecommerce",
+    "gaming",
+    "charge",
+    "checkout",
+    "wallet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BoltApp/bolt-frontend-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BoltApp/bolt-frontend-sdk/issues"
+  },
+  "homepage": "https://github.com/BoltApp/bolt-frontend-sdk#readme"
 }

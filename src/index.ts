@@ -1,3 +1,3 @@
-import "./style.css";
+import './style.css'
 
-export { BoltSDK } from "./main";
+export { Bolt as default } from './main'
