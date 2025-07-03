@@ -26,7 +26,7 @@ We also support other platforms:
       <a href="https://github.com/BoltApp/bolt-unity-sdk">Unity SDK</a>
     </td>
     <td align="center" width="150">
-      <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="40" height="40" style="background: black; padding: 10px" alt="Unreal"/><br>
+      <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="49" height="60" alt="Unreal"/><br>
       <b>Unreal Engine</b><br>
       <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
     </td>
@@ -66,7 +66,7 @@ Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better t
 <strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
 </p>
 
-## �️ Prerequisites
+## 🛠️ Prerequisites
 
 You need 3 things to get started:
 
