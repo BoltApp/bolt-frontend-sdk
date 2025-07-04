@@ -1,0 +1,157 @@
+:root {
+  /* Color tokens */
+  --color-primary: #221596;
+  --color-secondary: #6323a2;
+  --color-accent: #ffd700;
+  --color-accent-hover: #ffed4e;
+  --color-text: #e0e0e0;
+  --color-white: #fff;
+  --color-button-primary: #4facfe;
+  --color-button-secondary: #00f2fe;
+  --color-disabled: #6c757d;
+  --color-disabled-light: #adb5bd;
+  --color-glass-bg: rgba(255, 255, 255, 0.1);
+  --color-glass-border: rgba(255, 255, 255, 0.2);
+  --color-glass-border-hover: rgba(255, 255, 255, 0.3);
+  --color-shadow: rgba(0, 0, 0, 0.3);
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-button-shadow: rgba(79, 172, 254, 0.4);
+  --color-box-shadow: rgba(0, 0, 0, 0.2);
+
+  /* Gradient tokens */
+  --gradient-primary: linear-gradient(
+    45deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  --gradient-button: linear-gradient(
+    45deg,
+    var(--color-button-primary),
+    var(--color-button-secondary)
+  );
+  --gradient-accent: linear-gradient(
+    45deg,
+    var(--color-accent),
+    var(--color-accent-hover)
+  );
+  --gradient-disabled: linear-gradient(
+    45deg,
+    var(--color-disabled),
+    var(--color-disabled-light)
+  );
+
+  color: var(--color-text);
+  color-scheme: light dark;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.5;
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--gradient-primary);
+  color: var(--color-text);
+  margin: 0;
+  min-height: 100vh;
+  padding: 0;
+}
+
+a {
+  color: var(--color-accent);
+  font-weight: 500;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+button {
+  background: var(--gradient-button);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--color-white);
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.75rem 1.5rem;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 4px 15px var(--color-button-shadow);
+  transform: translateY(-2px);
+}
+
+button:disabled {
+  background: var(--gradient-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Glassmorphism effects for cards and containers */
+.card,
+.container {
+  backdrop-filter: blur(10px);
+  background: var(--color-glass-bg);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover,
+.container:hover {
+  border-color: var(--color-glass-border-hover);
+  box-shadow: 0 8px 25px var(--color-box-shadow);
+  transform: translateY(-2px);
+}
+
+/* Golden accent colors */
+.accent {
+  color: var(--color-accent);
+}
+
+.accent-bg {
+  background: var(--gradient-accent);
+}
+
+/* Text shadows for better readability */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-shadow: 0 2px 4px var(--color-shadow);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card,
+  .container {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    background: var(--gradient-primary);
+    color: var(--color-white);
+  }
+
+  a:hover {
+    color: var(--color-accent-hover);
+  }
+
+  button {
+    background: var(--color-glass-bg);
+    border: 1px solid var(--color-glass-border);
+    color: var(--color-white);
+  }
+}
