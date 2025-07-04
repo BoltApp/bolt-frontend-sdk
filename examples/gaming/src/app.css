@@ -1,0 +1,139 @@
+/* New styles for gaming store demo */
+.app-header {
+  margin-bottom: 3rem;
+}
+
+.app-header h1 {
+  /* background: linear-gradient(45deg, #2748dc, #6323a2); */
+  background: linear-gradient(135deg, #8594d6 0%, #b586e1 100%);
+  background-clip: text;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+.app-header h1::before {
+  box-shadow: 0 5px 25px 10px rgba(30, 38, 71, 0.3);
+  content: '';
+  display: block;
+  height: 0;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  z-index: -1;
+}
+
+.app-header p {
+  color: #e0e0e0;
+  font-size: 1.2rem;
+}
+
+.app-content {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  margin-bottom: 3rem;
+}
+
+.demo-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+  transition: transform 0.3s ease;
+}
+
+.demo-card:hover {
+  transform: translateY(-4px);
+}
+
+.demo-card h2 {
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.demo-card p {
+  margin-bottom: 1.5rem;
+}
+
+.demo-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.demo-card li {
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+}
+
+.demo-button {
+  background: linear-gradient(45deg, #e6c200, #ffed4e);
+  border: 0;
+  border-radius: 8px;
+  color: #444;
+  cursor: pointer;
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.8rem 1.5rem;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+.demo-button:hover {
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  color: #222;
+  transform: translateY(-2px);
+}
+
+.app-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: #666;
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .app-content {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header h1 {
+    font-size: 2rem;
+  }
+}
+
+.app-nav {
+  align-items: center;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-brand-link {
+  color: var(--color-text);
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.index-page {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}

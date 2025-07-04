@@ -1,0 +1,273 @@
+/* CoinStore.css */
+
+.coin-store {
+  color: #fff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0 auto;
+  max-width: 1200px;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.coin-store-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.coin-store-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.coin-store-header p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.coin-packages-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin-bottom: 3rem;
+}
+
+.coin-package {
+  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 0, 0, 0.1) 70%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 320px;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.coin-package:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  transform: translateY(-4px);
+}
+
+.coin-package.popular {
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+}
+
+.coin-package.selected {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.popular-badge {
+  background: linear-gradient(45deg, #ffd700, #ffed4e);
+  border-radius: 0 16px;
+  color: #333;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 0.5rem 1rem;
+  position: absolute;
+  right: -1px;
+  text-transform: uppercase;
+  top: -1px;
+}
+
+.product-image {
+  inset-inline: 0;
+  object-fit: cover;
+  position: absolute;
+  top: 80px;
+  width: 100%;
+  z-index: -1;
+}
+
+.savings-badge {
+  background: linear-gradient(45deg, #d45c5c, #ff7070);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  color: var(--text-white);
+  font-size: 0.8rem;
+  font-weight: 600;
+  left: -0.5rem;
+  letter-spacing: 0.5px;
+  padding: 0.3rem 0.8rem;
+  position: absolute;
+  text-transform: uppercase;
+  top: 1rem;
+}
+
+.coin-package-header {
+  text-align: center;
+}
+
+.coin-package-header h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.coins-display {
+  display: inline-flex;
+  flex-direction: column;
+  font-weight: 700;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.coins-display strong {
+  color: #ffd700;
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+
+.bonus-amount {
+  color: var(--text-white);
+  flex: 1;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+.bonus-amount::before {
+  content: '\00A0';
+}
+
+.price-display {
+  line-height: 1.2;
+  text-align: center;
+}
+
+.price-label {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.price-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.coin-store-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 2rem;
+  padding-top: 2rem;
+  text-align: center;
+}
+
+.coin-store-footer p {
+  align-items: center;
+  display: flex;
+  font-size: 0.9rem;
+  gap: 0.5rem;
+  justify-content: center;
+  opacity: 0.8;
+}
+
+.secure-icon {
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .coin-store {
+    padding: 1rem;
+  }
+
+  .coin-store-header h1 {
+    font-size: 2rem;
+  }
+
+  .coin-packages-grid {
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .coin-package {
+    padding: 1rem;
+  }
+
+  .coins-display {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .coin-store-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .coin-packages-grid {
+    gap: 0.8rem;
+  }
+
+  .popular-badge {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .savings-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+}
+
+/* Animation for grid items */
+/* stylelint-disable-next-line no-duplicate-selectors */
+.coin-package {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.coin-package:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.coin-package:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.coin-package:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.coin-package:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+.coin-package:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+.coin-package:nth-child(6) {
+  animation-delay: 0.6s;
+}
+
+.coin-package:nth-child(7) {
+  animation-delay: 0.7s;
+}
+
+.coin-package:nth-child(8) {
+  animation-delay: 0.8s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
