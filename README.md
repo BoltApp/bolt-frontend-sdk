@@ -116,7 +116,7 @@ You need to bring your own server to safely handle transactions and api keys.
    - This is how you will interact with the Charge API and manage digital subscriptions
    - Docs: https://help.bolt.com/products/bolt-charge/charge-setup/
    - API: https://help.bolt.com/api-subscriptions/
-   - Example server: https://github.com/davidminin/bolt-gameserver-sample
+   - Example server: https://github.com/BoltApp/bolt-gameserver-sample
 2. Set up the Authorization Webhook
    - _"Authorization"_ is an industry term for transactions
    - This is how you will check if a user completed a transaction
