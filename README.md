@@ -1,6 +1,6 @@
 # Bolt JavaScript SDK
 
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/12603470/462617955-60acbf34-6d51-4bd6-a5fc-272751e444e1.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250704%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250704T190556Z&X-Amz-Expires=300&X-Amz-Signature=5820bb26ab2439cc0c5eeaa7c2968abb05bd7084bdaf7bf3e8747fe938d6d7e9&X-Amz-SignedHeaders=host" />
+<img src="https://github.com/BoltApp/bolt-gameserver-sample/blob/main/public/banner-javascript.png?raw=true" />
 
 ## What is this?
 
