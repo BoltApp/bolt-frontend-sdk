@@ -1,9 +1,6 @@
 # Bolt JavaScript SDK
 
-<div align="center" style="display:flex;justify-content:center;margin-bottom:20px">
-  <img src="https://res.cloudinary.com/dugcmkito/image/upload/v1744983998/bolt_accounts_2x_6c96bccd82.png" alt="Bolt Charge Hero" height="250px">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" height="250px" />
-</div>
+<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/12603470/462617955-60acbf34-6d51-4bd6-a5fc-272751e444e1.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250704%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250704T190556Z&X-Amz-Expires=300&X-Amz-Signature=5820bb26ab2439cc0c5eeaa7c2968abb05bd7084bdaf7bf3e8747fe938d6d7e9&X-Amz-SignedHeaders=host" />
 
 ## What is this?
 
@@ -26,7 +23,7 @@ We also support other platforms:
       <a href="https://github.com/BoltApp/bolt-unity-sdk">Unity SDK</a>
     </td>
     <td align="center" width="150">
-      <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="49" height="60" alt="Unreal"/><br>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf3R8LFTgqC_8mooGEx7Fpas9kHu8OUxhLA&s" width="60" height="60" alt="Unreal"/><br>
       <b>Unreal Engine</b><br>
       <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
     </td>
