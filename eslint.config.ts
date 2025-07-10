@@ -39,6 +39,7 @@ export default [
           semi: false,
         },
       ],
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 ] satisfies Linter.Config[]
