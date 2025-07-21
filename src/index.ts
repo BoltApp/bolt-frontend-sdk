@@ -1,1 +1,1 @@
-export { Charge } from './charge'
+export { Charge, type CheckoutResult } from './charge'
