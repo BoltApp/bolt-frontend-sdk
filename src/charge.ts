@@ -50,8 +50,9 @@ export const Charge = {
       // Listen for transaction success
       function handleMessage(event: MessageEvent) {
         if (isBoltTransactionSuccessEvent(event.data)) {
-          window.postMessage({ type: 'bolt-charge-succeeded' }, '*')
-          closeModal({ status: 'success', payload: event.data.payload })
+          const iframeOrigin = new URL(url).origin
+          window.postMessage({ type: 'bolt-charge-succeeded' }, iframeOrigin)
+          closeModal({ status: 'success', payload: event.data?.payload })
         }
       }
       window.addEventListener('message', handleMessage)

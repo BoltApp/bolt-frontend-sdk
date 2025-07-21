@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bolt Checkout Demo - Discriminated Union API</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+
+      .demo-section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background: #fafafa;
+      }
+
+      button {
+        background: #6c5ce7;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 5px;
+        transition: background 0.2s;
+      }
+
+      button:hover {
+        background: #5a4fcf;
+      }
+
+      #status {
+        background-color: var(--status-bg, #e3f2fd);
+        margin: 20px 0;
+        padding: 10px;
+        border-radius: 6px;
+        min-height: 20px;
+      }
+
+      pre {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 15px;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🚀 Bolt Checkout Demo</h1>
+      <h2>Discriminated Union API</h2>
+      <p>
+        The checkout now returns a clear result object indicating success or
+        user closure.
+      </p>
+    </div>
+
+    <div class="demo-section">
+      <h3>🛒 Checkout Demo</h3>
+      <p>
+        Click the button below to open the checkout. The result will clearly
+        indicate whether the transaction succeeded or the user closed the modal.
+      </p>
+      <button id="bolt-charge-button">Open Bolt Checkout</button>
+      <div id="status"></div>
+    </div>
+
+    <div class="demo-section">
+      <h3>📋 API Overview</h3>
+      <p>The new API returns a discriminated union:</p>
+      <pre><code>type CheckoutResult =
+  | { status: 'success'; payload: BoltTransactionSuccess }
+  | { status: 'closed' }
+
+// Usage:
+const result = await Charge.checkout(url)
+if (result.status === 'success') {
+  // Handle successful transaction
+  console.log('Reference:', result.payload.reference)
+} else if (result.status === 'closed') {
+  // Handle user closure
+  console.log('User closed the checkout')
+}</code></pre>
+    </div>
+
+    <div id="status"></div>
+
+    <script type="module" src="/main.ts"></script>
+  </body>
+</html>
