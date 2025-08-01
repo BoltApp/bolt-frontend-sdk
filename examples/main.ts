@@ -1,7 +1,7 @@
 import { Charge, CheckoutResult } from '../src/index'
 
 const SAMPLE_BOLT_CHECKOUT_LINK =
-  'https://gregs-guava-myshopify.c-staging.bolt.com/c?u=7oLxSjeYAcfTFpKsK2o43r&publishable_key=zQVb4QDUzwJD.GOxcEQV1ZNbW.bb17ba147d91e23de2647182d1381b60b281a2cd47092642a2fa214229cc43de'
+  'https://santhosh.c-staging.bolt.com/o?order_token=7e1c6f2eb21b38b1a8da8362219c2fbf0381d7a45ac284ea408e4777373d2a19&publishable_key=Hf5r926t0V07.t8fzalINqixy.69510e34f8911f81c00b28848779a710b3fa595d9eab22b119f3cf1bb186b22d'
 
 document.addEventListener('DOMContentLoaded', () => {
   const checkoutButton = document.getElementById('bolt-charge-button')

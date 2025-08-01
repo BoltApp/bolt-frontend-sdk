@@ -17,3 +17,14 @@ export function isBoltTransactionSuccessEvent(
     typeof event?.payload?.reference === 'string'
   )
 }
+
+export function isBoltCloseEvent(
+  data: unknown
+): data is { type: 'bolt-bce-close-checkout' } {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    (data as { type: unknown }).type === 'bolt-bce-close-checkout'
+  )
+}

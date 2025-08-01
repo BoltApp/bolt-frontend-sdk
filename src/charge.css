@@ -17,39 +17,17 @@
   box-shadow: 0 2px 24px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  max-height: 90vh;
+  max-height: 100vh;
   max-width: 90vw;
   padding: 0;
   position: relative;
-  width: 450px;
+  width: 480px;
 }
 
 #bolt-iframe-modal {
   border: 0;
   border-radius: 10px;
   display: block;
-  height: 70vh;
+  height: 96vh;
   width: 100%;
-}
-
-#bolt-modal-close {
-  align-items: center;
-  background: #fff;
-  border: 0;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-  color: #333;
-  cursor: pointer;
-  display: flex;
-  font-size: 2rem;
-  height: 20px;
-  justify-content: center;
-  line-height: 1;
-  padding: 25px;
-  position: absolute;
-  right: -16px;
-  top: -16px;
-  width: 20px;
-  z-index: 10000;
 }
