@@ -45,7 +45,7 @@ export const Charge = {
 
       // Listen for transaction success
       function handleMessage(event: MessageEvent) {
-        if (event.data.type == null || event.data.type.startsWith('TOGGLE')) {
+        if (event.data?.type == null) {
           return
         }
         const iframeOrigin = new URL(url).origin
