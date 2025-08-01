@@ -38,11 +38,6 @@ export const Charge = {
         resolve(result)
       }
 
-      // Close on X button
-      activeModal
-        .querySelector('#bolt-modal-close')
-        ?.addEventListener('click', () => closeModal())
-
       // Listen for transaction success
       function handleMessage(event: MessageEvent) {
         if (event.data?.type == null) {

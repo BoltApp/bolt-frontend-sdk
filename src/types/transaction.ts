@@ -8,23 +8,16 @@ export type BoltTransactionSuccessEventData = {
 }
 
 export function isBoltTransactionSuccessEvent(
-  data: unknown
+  data: any
 ): data is BoltTransactionSuccessEventData {
-  const event = data as { type?: unknown; payload?: { reference?: unknown } }
   return (
-    typeof event?.type === 'string' &&
-    event.type === 'bolt-bce-transaction-success' &&
-    typeof event?.payload?.reference === 'string'
+    data.type === 'bolt-bce-transaction-success' &&
+    typeof data.payload?.reference === 'string'
   )
 }
 
 export function isBoltCloseEvent(
-  data: unknown
+  data: any
 ): data is { type: 'bolt-bce-close-checkout' } {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'type' in data &&
-    (data as { type: unknown }).type === 'bolt-bce-close-checkout'
-  )
+  return data.type === 'bolt-bce-close-checkout'
 }
