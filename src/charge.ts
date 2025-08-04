@@ -1,5 +1,6 @@
 import {
   BoltTransactionSuccess,
+  isBoltCloseEvent,
   isBoltTransactionSuccessEvent,
 } from './types/transaction'
 
@@ -23,7 +24,6 @@ export const Charge = {
       activeModal.id = 'bolt-modal-overlay'
       activeModal.innerHTML = `
         <div id="bolt-modal-container">
-          <button id="bolt-modal-close" aria-label="Close">×</button>
           <iframe src="${url}" id="bolt-iframe-modal"></iframe>
         </div>
       `
@@ -38,21 +38,18 @@ export const Charge = {
         resolve(result)
       }
 
-      // Close on X button
-      activeModal
-        .querySelector('#bolt-modal-close')
-        ?.addEventListener('click', () => closeModal())
-      // Close on overlay click (but not modal content)
-      activeModal.addEventListener('click', e => {
-        if (e.target === activeModal) closeModal()
-      })
-
       // Listen for transaction success
       function handleMessage(event: MessageEvent) {
+        if (event.data?.type == null) {
+          return
+        }
+        const iframeOrigin = new URL(url).origin
         if (isBoltTransactionSuccessEvent(event.data)) {
-          const iframeOrigin = new URL(url).origin
           window.postMessage({ type: 'bolt-charge-succeeded' }, iframeOrigin)
           closeModal({ status: 'success', payload: event.data?.payload })
+        } else if (isBoltCloseEvent(event.data)) {
+          window.postMessage({ type: 'bolt-charge-closed' }, iframeOrigin)
+          closeModal({ status: 'closed' })
         }
       }
       window.addEventListener('message', handleMessage)
