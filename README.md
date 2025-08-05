@@ -107,8 +107,8 @@ yarn add @boltpay/bolt-js
 
 ### Step 2: Add code to your game
 
-There is sample integrations in the `examples/` folder. 
-- [**JS SDK**](./examples/main.ts): will showcase how to initialize the client and open links
+There is a sample integration in the `examples/` folder. 
+- [**main.ts**](./examples/main.ts): will showcase how to initialize the client and open links
 
 ### Step 3: Continue with Backend Integration
 You will need to bring your own backend server to complete integration.
