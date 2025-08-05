@@ -55,6 +55,10 @@ We also support other platforms:
 
 </div>
 
+## 📚 Documentation
+
+For documentation and API reference visit our [quick start guide](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html).
+
 ## 💰 Why Bolt
 
 Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with using Bolt.
@@ -70,10 +74,6 @@ You need 3 things to get started:
 1. **Existing Web App:** You will need a web application (React, Vue, Angular, or vanilla JavaScript)
 2. **Backend Server:** You will need to bring your own backend server (any language)
 3. **Bolt Merchant Account:** Dashboard access to manage your gaming store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
-
-## 📚 Documentation
-
-For broad documentation and API reference visit our [documentation site](https://docs.bolt.com).
 
 ## 📦 Installation
 
