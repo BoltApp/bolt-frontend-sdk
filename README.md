@@ -4,7 +4,7 @@
 
 ## What is this?
 
-Native JavaScript/TypeScript support for [Bolt Charge](https://www.bolt.com/charge), a fully hosted webshop for out-of-app purchases and subscriptions.
+Native JavaScript/TypeScript support support for Bolt Web Payments. A programmatic way to for out-of-app purchases and subscriptions.
 
 We also support other platforms:
 
@@ -69,7 +69,7 @@ You need 3 things to get started:
 
 1. **Existing Web App:** You will need a web application (React, Vue, Angular, or vanilla JavaScript)
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started) or [login](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your gaming store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
 
 ## 📚 Documentation
 
@@ -105,92 +105,16 @@ bun install @boltpay/bolt-js
 yarn add @boltpay/bolt-js
 ```
 
-### Step 2: Set up your backend server
+### Step 2: Add code to your game
 
-You need to bring your own server to safely handle transactions and api keys.
+There is sample integrations in the `examples/` folder. 
+- [**JS SDK**](./examples/main.ts): will showcase how to initialize the client and open links
 
-1. Integrate the Bolt API
-   - This is how you will interact with the Charge API and manage digital subscriptions
-   - Docs: https://help.bolt.com/products/bolt-charge/charge-setup/
-   - API: https://help.bolt.com/api-subscriptions/
-   - Example server: https://github.com/BoltApp/bolt-gameserver-sample
-2. Set up the Authorization Webhook
-   - _"Authorization"_ is an industry term for transactions
-   - This is how you will check if a user completed a transaction
-   - Webhook Docs: https://help.bolt.com/developers/webhooks/webhooks
-   - Webhook Events: https://help.bolt.com/developers/webhooks/webhooks/#authorization-events
-   - API: https://help.bolt.com/api-merchant/#tag/webhooks/POST/webhooks_transaction
-3. Note your server URL (like `https://your-server.herokuapp.com`)
-   - You will use this URL for initializing the api client in Step 4
-   - Consider using configs for managing different environments
+### Step 3: Continue with Backend Integration
+You will need to bring your own backend server to complete integration.
+- [**Quick Start**](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html): View our quickstart guide to get the API running
+- [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
 
-### Step 3: Get your Bolt account
-
-1. Go to [merchant.bolt.com](https://www.merchant.bolt.com) and login to the dashboard. You can [signup here](https://merchant.bolt.com/onboarding/get-started) if you don't have an account.
-2. Set up your products in the Bolt dashboard. You can find [helpful instructions in our documentation](https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products).
-3. Get your checkout links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
-
-### Step 4: Add code to your web app
-
-```ts
-import { Charge } from '@boltpay/bolt-js'
-
-// Call this when user wants to buy something
-async function buyItem(checkoutUrl: string) {
-  const transaction = await Charge.checkout(checkoutUrl)
-  console.log('Payment successful!', transaction.reference)
-
-  // Recommended: sync your user object by polling your backend
-  // since a transaction webhook will have hit your backend server.
-  await syncUserData()
-}
-
-// Example usage in your app
-document.getElementById('buy-button')?.addEventListener('click', () => {
-  buyItem('https://your-checkout-link-here.com')
-})
-```
-
-## Step 5: Test it
-
-1. Add the code to your web application
-2. Use your checkout URL from Step 3
-3. Call `buyItem()` with a Bolt payment link
-   - **Note:** You can use our staging url for testing purposes: https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695
-4. The payment page should open as a modal in your web app
-5. Complete a test transaction
-
-**Congratulations 🎉**
-<br>You have successfully integrated Bolt Charge into your web app!
-
-## Next Steps
-
-Now that you have a single checkout working, you will want to adopt some best practices to make them easy to maintain.
-
-#### Configs
-
-Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Example:
-
-```json
-{
-  "GEMS_100": "https://your-checkout-link-here.com",
-  "GEMS_500": "https://your-checkout-link-here.com",
-  "GEMS_1000": "https://your-checkout-link-here.com",
-  "BUNDLE_ONE": "https://your-checkout-link-here.com",
-  "BUNDLE_TWO": "https://your-checkout-link-here.com"
-}
-```
-
-#### Integration Tests
-
-We recommend setting up automated testing against the most common flows. Good test coverage should include UI or API test coverage of the following scenarios:
-
-- Checkout is possible to open
-- Checkout is possible to close
-- User gets success state from successful transaction
-- User gets failed state from failed transaction
-- User network interrupted after good payment, is shown success screen on reboot of app
-- User network interrupted after bad payment, is shown fail screen on reboot of app
 
 #### TypeScript Types
 
@@ -256,12 +180,6 @@ const handlePayment = async () => {
 }
 </script>
 ```
-
-#### Translations 🚧
-
-Bolt does support translations and handles many checkouts on the global market. However, right now the SDK is tailored to the U.S. market so only English is officially provided.
-
-We will be rolling out official multi-region support to Bolt Charge in the very near future. If you would like a preview or are curious about the timeline, you can reach out to our team directly.
 
 ## Need help?
 
