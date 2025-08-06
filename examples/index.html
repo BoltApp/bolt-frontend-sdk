@@ -67,30 +67,50 @@
     <div class="demo-section">
       <h3>🛒 Checkout Demo</h3>
       <p>
-        Click the button below to open the checkout. The result is a Promise
-        that returns whether the transaction succeeded or the user closed the
-        modal.
+        Click the button below to generate a payment link and open the checkout.
+        The SDK will handle the entire flow including payment link generation
+        and checkout modal management.
       </p>
       <button id="bolt-charge-button">Open Bolt Checkout</button>
+      <button id="resolve-first-pending">Resolve First Pending Session</button>
       <div id="status"></div>
     </div>
 
     <div class="demo-section">
       <h3>📋 API Overview</h3>
-      <p>Returns success or failure:</p>
-      <pre><code>type CheckoutResult =
-  | { status: 'success'; payload: BoltTransactionSuccess }
-  | { status: 'closed' }
+      <p>Initialize the SDK and handle checkout events:</p>
+      <pre><code>// Initialize the SDK
+BoltSDK.initialize({
+  gameId: 'com.knights-of-valor.game',
+  publishableKey: 'your-publishable-key',
+  environment: 'Development'
+})
 
-// Usage:
-const result = await Charge.checkout(url)
-if (result.status === 'success') {
-  // Handle successful transaction
-  console.log('Reference:', result.payload.reference)
-} else if (result.status === 'closed') {
-  // Handle user closure
-  console.log('User closed the checkout')
-}</code></pre>
+// Listen to checkout events
+BoltSDK.on('checkout-link-succeeded', ({ session }) => {
+  console.log('Transaction Completed:', session)
+})
+
+BoltSDK.on('checkout-link-failed', ({ session }) => {
+  console.log('Transaction failed:', session)
+})
+
+BoltSDK.on('checkout-link-closed', ({ session }) => {
+  console.log('Checkout closed:', session)
+})
+
+// Generate payment link and open checkout
+const paymentLink = await generatePaymentLink()
+const session = await BoltSDK.gaming.openCheckout(paymentLink.link)
+
+// Open checkout in new tab (optional)
+const session = await BoltSDK.gaming.openCheckout(paymentLink.link, { 
+  target: 'newTab' 
+})
+
+// Manage pending sessions
+const pending = BoltSDK.gaming.getPendingSessions()
+BoltSDK.gaming.resolveSession(sessionId, 'successful')</code></pre>
     </div>
 
     <script type="module" src="main.ts"></script>

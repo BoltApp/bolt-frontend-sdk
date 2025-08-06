@@ -22,7 +22,13 @@ export default defineConfig({
   },
   server: {
     open: true, // Automatically open browser
-    port: 3000, // Specify port
+    port: 3005, // Specify port
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     watch: false,

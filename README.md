@@ -107,14 +107,16 @@ yarn add @boltpay/bolt-js
 
 ### Step 2: Add code to your game
 
-There is a sample integration in the `examples/` folder. 
+There is a sample integration in the `examples/` folder.
+
 - [**main.ts**](./examples/main.ts): will showcase how to initialize the client and open links
 
 ### Step 3: Continue with Backend Integration
+
 You will need to bring your own backend server to complete integration.
+
 - [**Quick Start**](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html): View our quickstart guide to get the API running
 - [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
-
 
 #### TypeScript Types
 
