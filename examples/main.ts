@@ -93,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await getPaymentLink(session.paymentLinkId)
 
       const status = getTransactionStatus(response)
-      console.log('aaa', session.paymentLinkId, status)
       BoltSDK.gaming.resolveSession(session.paymentLinkId, status)
 
       if (status === 'pending') {
