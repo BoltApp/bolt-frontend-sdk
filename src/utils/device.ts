@@ -13,7 +13,7 @@ export const DeviceUtils = {
     // Generate or retrieve a persistent device ID
     let deviceId = localStorage.getItem('bolt_device_id')
     if (!deviceId) {
-      deviceId = 'device_' + Math.random().toString(36).substr(2, 16)
+      deviceId = 'device_' + Math.random().toString(36).substring(2, 18)
       localStorage.setItem('bolt_device_id', deviceId)
     }
     return deviceId

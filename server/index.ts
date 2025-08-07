@@ -17,6 +17,13 @@ const PORT = process.env.PORT || 3001
 const BOLT_API_KEY = process.env.BOLT_API_KEY
 const BOLT_PUBLISHABLE_KEY = process.env.BOLT_PUBLISHABLE_KEY
 
+if (!BOLT_PUBLISHABLE_KEY) {
+  throw new Error('BOLT_PUBLISHABLE_KEY environment variable is not set')
+}
+if (!BOLT_API_KEY) {
+  throw new Error('BOLT_API_KEY environment variable is not set')
+}
+
 app.use(cors())
 app.use(express.json())
 app.use(express.static(path.join(__dirname, '../testbed')))
