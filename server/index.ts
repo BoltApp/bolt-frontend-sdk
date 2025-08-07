@@ -2,6 +2,10 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import 'dotenv/config'
+import { config } from 'dotenv'
+
+config({ path: '.env.local' })
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -10,10 +14,8 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // STAGING: Knights of Valor
-const BOLT_API_KEY =
-  '9166cb911581e5c9ba46e9866054a2352d445e468b902bf473400e4a33d3144f'
-const BOLT_PUBLISHABLE_KEY =
-  '_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae'
+const BOLT_API_KEY = process.env.BOLT_API_KEY
+const BOLT_PUBLISHABLE_KEY = process.env.BOLT_PUBLISHABLE_KEY
 
 app.use(cors())
 app.use(express.json())
@@ -22,7 +24,7 @@ app.use(express.static(path.join(__dirname, '../testbed')))
 app.post('/api/payment-links', async (req, res) => {
   try {
     const response = await fetch(
-      'https://api-staging.bolt.com/v1/gaming/payment_links',
+      `${process.env.BOLT_API_URL}/v1/payment-links`,
       {
         method: 'POST',
         headers: {

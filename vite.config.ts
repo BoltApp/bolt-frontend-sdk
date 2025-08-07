@@ -11,6 +11,7 @@ const formats = Object.keys(fileName) as Array<keyof typeof fileName>
 
 export default defineConfig({
   base: './',
+  envPrefix: 'BOLT_',
   build: {
     outDir: './build/dist',
     lib: {

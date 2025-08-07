@@ -4,8 +4,7 @@ import { generatePaymentLink } from './bolt'
 // Initialize the Bolt SDK
 BoltSDK.initialize({
   gameId: 'com.knights-of-valor.game',
-  publishableKey:
-    '_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae',
+  publishableKey: import.meta.env.BOLT_PUBLISHABLE_KEY,
   environment: 'Development',
 })
 
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       updateStatus('Opening checkout...', 'info')
 
       const session = await BoltSDK.gaming.openCheckout(paymentLink.link)
-      console.log('Transaction Successful:', session)
+      console.log('Transaction Completed or Closed:', session)
     } catch (error) {
       updateStatus(`💥 Unexpected error: ${error}`, 'error')
       console.error('Checkout error:', error)
