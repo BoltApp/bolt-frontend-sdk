@@ -1,5 +1,5 @@
 import { BoltSDK } from '../src/index'
-import { generatePaymentLink } from './bolt'
+import { generatePaymentLink, getPaymentLink } from './bolt'
 
 // Initialize the Bolt SDK
 BoltSDK.initialize({
@@ -10,71 +10,100 @@ BoltSDK.initialize({
 
 document.addEventListener('DOMContentLoaded', () => {
   const checkoutButton = document.getElementById('bolt-charge-button')
-  const resolveButton = document.getElementById('resolve-first-pending')
-  const statusDiv = document.getElementById('status')!
+  const resolveButton = document.getElementById('resolve-pending')
+  const logDiv = document.getElementById('log')!
 
-  const updateStatus = (
+  const appendLog = (
     message: string,
     type: 'info' | 'success' | 'error' = 'info'
   ) => {
-    const colors = {
-      info: '#e3f2fd',
-      success: '#e8f5e8',
-      error: '#fdeaea',
-    }
-    statusDiv.style.setProperty('--status-bg', colors[type])
-    statusDiv.innerHTML = message
+    const timestamp = new Date().toLocaleTimeString()
+    const logEntry = document.createElement('div')
+    logEntry.className = `log-entry ${type}`
+    logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span>${message}`
+
+    logDiv.appendChild(logEntry)
+    logDiv.scrollTop = logDiv.scrollHeight
   }
 
   // Set up event listeners for SDK events
-  BoltSDK.on('checkout-link-succeeded', ({ session }) => {
-    console.log('Event: checkout-link-succeeded', session)
-    updateStatus(
+  BoltSDK.on('payment-link-succeeded', ({ session }) => {
+    console.log('Event: payment-link-succeeded', session)
+    appendLog(
       `✅ Transaction completed successfully!<br>
        Session ID: ${session.paymentLinkId}`,
       'success'
     )
   })
 
-  BoltSDK.on('checkout-link-closed', ({ session }) => {
-    console.log('Event: checkout-link-closed', session)
-    updateStatus('⚠️ Checkout closed by user', 'info')
+  BoltSDK.on('payment-link-closed', ({ session }) => {
+    console.log('Event: payment-link-closed', session)
+    appendLog('⚠️ Checkout closed by user', 'info')
   })
 
-  BoltSDK.on('checkout-link-failed', ({ session }) => {
-    console.log('Event: checkout-link-failed', session)
-    updateStatus('❌ Transaction failed', 'error')
+  BoltSDK.on('payment-link-failed', ({ session }) => {
+    console.log('Event: payment-link-failed', session)
+    appendLog('❌ Transaction failed', 'error')
   })
 
   checkoutButton?.addEventListener('click', async () => {
-    updateStatus('Generating payment link...', 'info')
+    appendLog('Generating payment link...', 'info')
 
     try {
       const paymentLink = await generatePaymentLink()
       console.log('Generated Payment Link:', paymentLink)
 
-      updateStatus('Opening checkout...', 'info')
+      appendLog('Opening checkout...', 'info')
 
       const session = await BoltSDK.gaming.openCheckout(paymentLink.link)
       console.log('Transaction Completed or Closed:', session)
     } catch (error) {
-      updateStatus(`💥 Unexpected error: ${error}`, 'error')
+      appendLog(`💥 Unexpected error: ${error}`, 'error')
       console.error('Checkout error:', error)
     }
   })
 
-  resolveButton?.addEventListener('click', () => {
+  type PaymentLinkResponse = {
+    payment_link_properties: any
+    transaction: any
+  }
+  function getPaymentLinkStatus(
+    response: PaymentLinkResponse
+  ): 'pending' | 'successful' {
+    if (!response.transaction) {
+      return 'pending'
+    }
+
+    return 'successful'
+  }
+
+  resolveButton?.addEventListener('click', async () => {
     const pendingSessions = BoltSDK.gaming.getPendingSessions()
-    if (pendingSessions.length > 0) {
-      const firstPending = pendingSessions[0]
-      BoltSDK.gaming.resolveSession(firstPending.paymentLinkId, 'successful')
-      updateStatus(
-        `✅ Resolved pending session: ${firstPending.paymentLinkId}`,
-        'success'
-      )
-    } else {
-      updateStatus('⚠️ No pending sessions to resolve', 'info')
+
+    if (pendingSessions.length === 0) {
+      appendLog('⚠️ No pending sessions to resolve', 'info')
       console.log('No pending sessions to resolve')
+      return
+    }
+
+    for (const session of pendingSessions) {
+      const response = await getPaymentLink(session.paymentLinkId)
+
+      const status = getPaymentLinkStatus(response)
+      console.log('aaa', session.paymentLinkId, status)
+      BoltSDK.gaming.resolveSession(session.paymentLinkId, status)
+
+      if (status === 'pending') {
+        appendLog(
+          `⚠️ Session ${session.paymentLinkId} is still pending`,
+          'info'
+        )
+      } else {
+        appendLog(
+          `✅ Resolved pending session: ${session.paymentLinkId} to ${status}`,
+          'success'
+        )
+      }
     }
   })
 })

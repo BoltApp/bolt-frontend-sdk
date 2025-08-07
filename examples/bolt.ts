@@ -20,3 +20,12 @@ export function generatePaymentLink() {
     }),
   }).then(response => response.json())
 }
+
+export function getPaymentLink(paymentLinkId: string) {
+  return fetch(`/api/payment-links/${paymentLinkId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then(response => response.json())
+}

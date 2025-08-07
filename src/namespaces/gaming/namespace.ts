@@ -63,7 +63,7 @@ export function createGamingNamespace(
         }
 
         logger.info(`Opening checkout link: ${session.paymentLinkUrl}`)
-        eventEmitter.emit('checkout-link-open', { session })
+        eventEmitter.emit('payment-link-open', { session })
 
         const checkoutPromise =
           options.target === 'newTab'
@@ -74,7 +74,7 @@ export function createGamingNamespace(
           if (result.status === 'closed') {
             session.update({ status: 'abandoned' })
           }
-          eventEmitter.emit('checkout-link-closed', { session })
+          eventEmitter.emit('payment-link-closed', { session })
           return session
         })
       } catch (ex) {
@@ -93,11 +93,13 @@ export function createGamingNamespace(
     ): PaymentLinkSession | undefined {
       const session = PaymentLinkSessions.getById(paymentLinkId)
       if (session) {
-        session.update({ status })
+        if (session.status !== status) {
+          session.update({ status })
+        }
         if (status === 'successful') {
-          eventEmitter.emit('checkout-link-succeeded', { session })
-        } else {
-          eventEmitter.emit('checkout-link-failed', { session })
+          eventEmitter.emit('payment-link-succeeded', { session })
+        } else if (status === 'abandoned') {
+          eventEmitter.emit('payment-link-failed', { session })
         }
       } else {
         logger.error(
