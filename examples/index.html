@@ -50,7 +50,7 @@ BoltSDK.on('payment-link-failed', ({ session }) => {
   console.log('Transaction failed:', session)
 })
 
-BoltSDK.on('payment-link-closed', ({ session }) => {
+BoltSDK.on('checkout-closed', ({ session }) => {
   console.log('Checkout closed:', session)
 })
 

@@ -63,7 +63,7 @@ export function createGamingNamespace(
         }
 
         logger.info(`Opening checkout link: ${session.paymentLinkUrl}`)
-        eventEmitter.emit('payment-link-open', { session })
+        eventEmitter.emit('checkout-opened', { session })
 
         const checkoutPromise =
           options.target === 'newTab'
@@ -74,7 +74,7 @@ export function createGamingNamespace(
           if (result.status === 'closed') {
             session.update({ status: 'abandoned' })
           }
-          eventEmitter.emit('payment-link-closed', { session })
+          eventEmitter.emit('checkout-closed', { session })
           return session
         })
       } catch (ex) {

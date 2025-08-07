@@ -36,9 +36,16 @@ document.addEventListener('DOMContentLoaded', () => {
     )
   })
 
-  BoltSDK.on('payment-link-closed', ({ session }) => {
-    console.log('Event: payment-link-closed', session)
-    appendLog('⚠️ Checkout closed by user', 'info')
+  BoltSDK.on('checkout-closed', ({ session }) => {
+    console.log('Event: checkout-closed', session)
+    if (session.status === 'abandoned') {
+      appendLog('⚠️ Checkout closed by user', 'info')
+    } else if (session.status === 'pending') {
+      appendLog(
+        `✅ User completed checkout, but status is still pending.<br>`,
+        'info'
+      )
+    }
   })
 
   BoltSDK.on('payment-link-failed', ({ session }) => {
@@ -67,14 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
     payment_link_properties: any
     transaction: any
   }
-  function getPaymentLinkStatus(
+  function getTransactionStatus(
     response: PaymentLinkResponse
   ): 'pending' | 'successful' {
-    if (!response.transaction) {
-      return 'pending'
-    }
-
-    return 'successful'
+    return !response.transaction ? 'pending' : response.transaction.status
   }
 
   resolveButton?.addEventListener('click', async () => {
@@ -89,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const session of pendingSessions) {
       const response = await getPaymentLink(session.paymentLinkId)
 
-      const status = getPaymentLinkStatus(response)
+      const status = getTransactionStatus(response)
       console.log('aaa', session.paymentLinkId, status)
       BoltSDK.gaming.resolveSession(session.paymentLinkId, status)
 
