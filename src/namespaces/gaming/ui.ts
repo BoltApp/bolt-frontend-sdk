@@ -2,9 +2,9 @@ import {
   BoltTransactionSuccess,
   isBoltCloseEvent,
   isBoltTransactionSuccessEvent,
-} from './types/transaction'
+} from '../../types/transaction'
 
-import css from './charge.css?raw'
+import css from './ui.css?raw'
 
 let activeModal: HTMLDivElement | null = null
 
@@ -12,8 +12,8 @@ export type CheckoutResult =
   | { status: 'success'; payload: BoltTransactionSuccess }
   | { status: 'closed' }
 
-export const Charge = {
-  checkout: (url: string): Promise<CheckoutResult> => {
+export const GamingUI = {
+  checkoutInIframe: (url: string): Promise<CheckoutResult> => {
     return new Promise(resolve => {
       if (activeModal) {
         activeModal.remove()
@@ -53,6 +53,42 @@ export const Charge = {
         }
       }
       window.addEventListener('message', handleMessage)
+    })
+  },
+
+  checkoutInNewTab: (url: string): Promise<CheckoutResult> => {
+    return new Promise(resolve => {
+      const newTab = window.open(url, '_blank')
+      if (!newTab) {
+        resolve({ status: 'closed' })
+        return
+      }
+
+      // Listen for messages from the new tab
+      function handleMessage(event: MessageEvent) {
+        if (event.data?.type == null) {
+          return
+        }
+        if (isBoltTransactionSuccessEvent(event.data)) {
+          clearInterval(checkClosed)
+          window.removeEventListener('message', handleMessage)
+          resolve({ status: 'success', payload: event.data?.payload })
+        } else if (isBoltCloseEvent(event.data)) {
+          clearInterval(checkClosed)
+          window.removeEventListener('message', handleMessage)
+          resolve({ status: 'closed' })
+        }
+      }
+      window.addEventListener('message', handleMessage)
+
+      // Poll to detect when the new tab is closed
+      const checkClosed = setInterval(() => {
+        if (newTab.closed) {
+          clearInterval(checkClosed)
+          window.removeEventListener('message', handleMessage)
+          resolve({ status: 'closed' })
+        }
+      }, 1000) // Check every second
     })
   },
 }
