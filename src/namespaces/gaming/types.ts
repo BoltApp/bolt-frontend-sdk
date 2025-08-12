@@ -25,3 +25,18 @@ export interface PaymentLinkSessionArgs {
 export interface PaymentLinkTable {
   [id: string]: PaymentLinkSession
 }
+
+export interface GetPaymentLinkResponse {
+  paymentLink: PaymentLinkSession
+  transaction?: {
+    status:
+      | 'pending'
+      | 'authorized'
+      | 'completed'
+      | 'canceled'
+      | 'failed'
+      | 'rejectedReversible'
+      | 'rejectedIrreversible'
+    reference: string
+  }
+}
