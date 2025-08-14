@@ -70,16 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  type PaymentLinkResponse = {
-    payment_link_properties: any
-    transaction: any
-  }
-  function getTransactionStatus(
-    response: PaymentLinkResponse
-  ): 'pending' | 'successful' {
-    return !response.transaction ? 'pending' : response.transaction.status
-  }
-
   resolveButton?.addEventListener('click', async () => {
     const pendingSessions = BoltSDK.gaming.getPendingSessions()
 
@@ -92,10 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const session of pendingSessions) {
       const response = await getPaymentLink(session.paymentLinkId)
 
-      const status = getTransactionStatus(response)
-      BoltSDK.gaming.resolveSession(session.paymentLinkId, status)
+      const newSession = BoltSDK.gaming.resolveSession(response)
 
-      if (status === 'pending') {
+      if (newSession?.status === 'pending') {
         appendLog(
           `⚠️ Session ${session.paymentLinkId} is still pending`,
           'info'

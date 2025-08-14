@@ -1,3 +1,5 @@
+import { GetPaymentLinkResponse } from '../src'
+
 // Frontend version - calls backend API instead of Bolt API directly
 export function generatePaymentLink() {
   return fetch('/api/payment-links', {
@@ -21,7 +23,9 @@ export function generatePaymentLink() {
   }).then(response => response.json())
 }
 
-export function getPaymentLink(paymentLinkId: string) {
+export function getPaymentLink(
+  paymentLinkId: string
+): Promise<GetPaymentLinkResponse> {
   return fetch(`/api/payment-links/${paymentLinkId}`, {
     method: 'GET',
     headers: {
