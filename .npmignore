@@ -10,6 +10,8 @@ eslint.config.ts
 .stylelintignore
 dts-bundle-generator.config.ts
 tsconfig.jsonvite.config.ts
+server/
+examples/
 
 # Keep build files
 !build/
