@@ -14,7 +14,7 @@ export const PaymentLinkSessions = {
     )!
   },
 
-  store(session: PaymentLinkSessionClass) {
+  store(session: PaymentLinkSessionModel) {
     if (!session.isValid()) {
       return undefined
     }
@@ -25,13 +25,13 @@ export const PaymentLinkSessions = {
     StorageService.setObject(STORAGE_KEYS.PAYMENT_SESSION_HISTORY, table)
   },
 
-  getById(paymentLinkId: string): PaymentLinkSessionClass | undefined {
+  getById(paymentLinkId: string): PaymentLinkSessionModel | undefined {
     const paymentLinkSessions = this.getPaymentLinkSessionHistory()
     const data = paymentLinkSessions[paymentLinkId]
     if (!data) {
       return undefined
     }
-    return new PaymentLinkSessionClass(data)
+    return new PaymentLinkSessionModel(data)
   },
 
   getAllByStatus(status: PaymentLinkStatus): PaymentLinkSession[] {
@@ -41,15 +41,15 @@ export const PaymentLinkSessions = {
 
   updateOrCreate(
     args: PaymentLinkSessionArgs
-  ): PaymentLinkSessionClass | undefined {
+  ): PaymentLinkSessionModel | undefined {
     const instance =
       this.getById(args.paymentLinkId)?.update(args) ??
-      new PaymentLinkSessionClass(args).save()
+      new PaymentLinkSessionModel(args).save()
     return instance.isValid() ? instance : undefined
   },
 }
 
-export class PaymentLinkSessionClass {
+export class PaymentLinkSessionModel {
   paymentLinkId: string
   paymentLinkUrl: string
   status: PaymentLinkStatus
@@ -65,7 +65,7 @@ export class PaymentLinkSessionClass {
     this.updatedAt = args.updatedAt ?? new Date()
   }
 
-  save(): PaymentLinkSessionClass {
+  save(): PaymentLinkSessionModel {
     this.updatedAt = new Date()
 
     if (this.status === 'successful') {
@@ -76,7 +76,7 @@ export class PaymentLinkSessionClass {
     return this
   }
 
-  update(args: Partial<PaymentLinkSessionArgs> = {}): PaymentLinkSessionClass {
+  update(args: Partial<PaymentLinkSessionArgs> = {}): PaymentLinkSessionModel {
     Object.assign(this, args)
     return this.save()
   }

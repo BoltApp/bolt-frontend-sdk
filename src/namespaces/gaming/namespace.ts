@@ -2,15 +2,12 @@ import { BoltConfig } from '../../config'
 import { EventEmitter } from '../../utils/event-emitter'
 import { logger } from '../../utils/logger'
 import { PaymentLinkSessions } from './sessions'
-import {
-  GetPaymentLinkResponse,
-  PaymentLinkSession,
-  PaymentLinkStatus,
-} from './types'
+import type { PaymentLinkSession, PaymentLinkStatus } from './types'
 import { UrlUtils } from '../../utils/url'
 import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
 import { GamingUI } from './ui'
+import type { GetPaymentLinkResponse } from '@/types/endpoints'
 
 type OpenCheckoutOptions = {
   target?: 'iframe' | 'newTab' // Default: 'iframe'
@@ -93,9 +90,7 @@ export function createGamingNamespace(
     resolveSession(
       response: GetPaymentLinkResponse
     ): PaymentLinkSession | undefined {
-      const session = PaymentLinkSessions.getById(
-        response.paymentLink.paymentLinkId
-      )
+      const session = PaymentLinkSessions.getById(response.payment_link.id)
       const newStatus = sessionStatusFromTransaction(response.transaction)
       if (session) {
         if (session.status !== newStatus) {
@@ -108,7 +103,7 @@ export function createGamingNamespace(
         }
       } else {
         logger.error(
-          `Failed to resolve payment link session. Session not found for id: ${response.paymentLink.paymentLinkId}`
+          `Failed to resolve payment link session. Session not found for id: ${response.payment_link.id}`
         )
       }
       return session
