@@ -19,12 +19,17 @@ export const GamingUI = {
         activeModal.remove()
       }
 
+      const urlParams = new URLSearchParams({
+        window_location: window.location.toString(),
+      })
+
+      const iframeUrl = `url?${urlParams.toString()}`
       // Create modal elements
       activeModal = document.createElement('div')
       activeModal.id = 'bolt-modal-overlay'
       activeModal.innerHTML = `
         <div id="bolt-modal-container">
-          <iframe src="${url}" allow="payment *" id="bolt-iframe-modal"></iframe>
+          <iframe src=${iframeUrl}" allow="payment *" id="bolt-iframe-modal"></iframe>
         </div>
       `
       document.body.appendChild(activeModal)
