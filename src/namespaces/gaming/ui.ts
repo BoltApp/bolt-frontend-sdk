@@ -28,7 +28,7 @@ export const GamingUI = {
       activeModal.id = 'bolt-modal-overlay'
       activeModal.innerHTML = `
         <div id="bolt-modal-container">
-          <iframe src=${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
+          <iframe src=${iframeSrc} allow="payment *" id="bolt-iframe-modal"></iframe>
         </div>
       `
       document.body.appendChild(activeModal)
