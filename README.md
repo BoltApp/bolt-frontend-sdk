@@ -73,7 +73,7 @@ You need 3 things to get started:
 
 1. **Existing Web App:** You will need a web application (React, Vue, Angular, or vanilla JavaScript)
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your gaming store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your gaming store ([sign up](https://merchant.bolt.com/onboarding/get-started/gaming) or [log in](https://merchant.bolt.com/))
 
 ## 📦 Installation
 
