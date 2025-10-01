@@ -9,11 +9,12 @@ export function generatePaymentLink() {
     },
     body: JSON.stringify({
       item: {
-        price: 5999,
-        name: 'Gem Pack',
+        name: '250 Ru Dollas',
+        price: 499,
         currency: 'USD',
+        image_url:
+          'https://eggplant-nucleo-dev.s3.us-west-2.amazonaws.com/images/ui_icon_bundle_gem1.png',
       },
-      redirect_url: 'https://bolt.com',
       user_id: 'awesome user',
       game_id: 'awesome game',
       metadata: {

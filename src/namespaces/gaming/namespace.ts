@@ -8,6 +8,7 @@ import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
 import { GamingUI } from './ui'
 import type { GetPaymentLinkResponse } from '@/types/endpoints'
+import { AdOptions } from '@/types/ads'
 
 type OpenCheckoutOptions = {
   target?: 'iframe' | 'newTab' // Default: 'iframe'
@@ -18,6 +19,7 @@ export interface GamingNamespace {
     checkoutLink: string,
     options?: OpenCheckoutOptions
   ) => Promise<PaymentLinkSession | undefined>
+  openAd: (adLink: string, options?: AdOptions) => Promise<void>
   getPendingSessions: () => PaymentLinkSession[]
   resolveSession: (
     response: GetPaymentLinkResponse
@@ -79,6 +81,26 @@ export function createGamingNamespace(
         })
       } catch (ex) {
         logger.error(`Failed to open checkout link '${checkoutLink}': ${ex}`)
+        throw ex
+      }
+    },
+
+    openAd: async (adLink: string, options: AdOptions = {}): Promise<void> => {
+      try {
+        if (!adLink) {
+          logger.error('Advertisement link cannot be null or empty')
+          return
+        }
+
+        logger.info(`Opening ad link: ${adLink}`)
+        eventEmitter.emit('ad-opened', { adLink })
+
+        await GamingUI.openAdInIframe(adLink, options)
+
+        eventEmitter.emit('ad-completed', { adLink })
+        logger.info(`Ad completed: ${adLink}`)
+      } catch (ex) {
+        logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
         throw ex
       }
     },

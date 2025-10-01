@@ -69,6 +69,7 @@ app.post('/api/payment-links', async (req, res) => {
         item: {
           price: req.body.item.price,
           name: req.body.item.name,
+          image_url: req.body.item.image_url,
           currency: req.body.item.currency,
         },
         redirect_url: req.body.redirect_url,

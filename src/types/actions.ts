@@ -8,3 +8,5 @@ export type BoltAction =
       payload: { session: PaymentLinkSession }
     }
   | { type: 'payment-link-failed'; payload: { session: PaymentLinkSession } }
+  | { type: 'ad-opened'; payload: { adLink: string } }
+  | { type: 'ad-completed'; payload: { adLink: string } }

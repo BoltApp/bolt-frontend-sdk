@@ -1,3 +1,4 @@
+import { AdOptions } from '@/types/ads'
 import {
   BoltTransactionSuccess,
   isBoltCloseEvent,
@@ -8,11 +9,68 @@ import css from './ui.css?raw'
 
 let activeModal: HTMLDivElement | null = null
 
+const AD_WAIT_TIME_MS = 3_000
+const CHECK_TAB_POLLING_MS = 1_000
+
 export type CheckoutResult =
   | { status: 'success'; payload: BoltTransactionSuccess }
   | { status: 'closed' }
 
 export const GamingUI = {
+  openAdInIframe: async (
+    url: string,
+    options: AdOptions = {}
+  ): Promise<void> => {
+    if (activeModal) {
+      activeModal.remove()
+    }
+
+    const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
+    const timeoutSec = Math.ceil(timeoutMs / 1_000)
+
+    // Create modal elements
+    activeModal = document.createElement('div')
+    activeModal.id = 'bolt-modal-overlay'
+    activeModal.innerHTML = `
+      <div id="bolt-modal-container-ads">
+        <div id="bolt-ad-banner">
+          <div id="banner-counter">${timeoutSec}</div>
+        </div>
+        <iframe src="${url}" id="bolt-iframe-modal"></iframe>
+      </div>
+    `
+    document.body.appendChild(activeModal)
+    applyModalStyles()
+
+    const counter = activeModal.querySelector('#banner-counter')!
+    await new Promise<void>(resolve => {
+      let remainingSec = Math.ceil(timeoutMs / 1000)
+      // It would be more precise to make it recursive with requestAnimationFrame and Date,
+      // but this is good enough for a countdown timer.
+      const interval = setInterval(() => {
+        remainingSec--
+        if (remainingSec > 0) {
+          counter.textContent = remainingSec.toString()
+        } else {
+          clearInterval(interval)
+          resolve()
+        }
+      }, 1000)
+    })
+
+    counter.remove()
+
+    const claimRewardButton = document.createElement('button')
+    claimRewardButton.id = 'claim-reward-button'
+    claimRewardButton.textContent = 'Claim Reward'
+    claimRewardButton.onclick = () => {
+      activeModal?.remove()
+
+      setTimeout(() => options.onClaim?.())
+    }
+    activeModal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
+  },
+
   checkoutInIframe: (url: string): Promise<CheckoutResult> => {
     return new Promise(resolve => {
       if (activeModal) {
@@ -88,7 +146,7 @@ export const GamingUI = {
           window.removeEventListener('message', handleMessage)
           resolve({ status: 'closed' })
         }
-      }, 1000) // Check every second
+      }, CHECK_TAB_POLLING_MS)
     })
   },
 }
