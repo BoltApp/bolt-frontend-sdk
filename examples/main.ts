@@ -99,18 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
-  BoltSDK.gaming.openAd(
-    'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
-    {
-      onClaim: () => {
-        alert('success!')
-      },
-    }
-  )
+  function preloadAd() {
+    return BoltSDK.gaming.preloadAd(
+      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
+      {
+        onClaim: () => {
+          alert('success!')
+        },
+      }
+    )
+  }
+  let id = preloadAd()
 
   advertisementButton?.addEventListener('click', async () => {
     appendLog('Opening advertisement...', 'info')
 
-    BoltSDK.gaming.show()
+    if (id != null) {
+      await BoltSDK.gaming.showPreload(id)
+      appendLog('Advertisement completed!', 'success')
+
+      id = preloadAd()
+    }
   })
 })

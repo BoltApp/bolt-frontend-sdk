@@ -8,9 +8,17 @@ import {
 import css from './ui.css?raw'
 
 let activeModal: HTMLDialogElement | null = null
-let activeModalOptions: AdOptions | null = null
 
-const AD_WAIT_TIME_MS = 10_000
+type PreloadedArgs = {
+  options: AdOptions
+  element: HTMLDialogElement
+}
+
+// Should we limit the size of this map to avoid performance issues?
+// Multiple iframes can be preloaded, but only one modal can be active at a time
+const preloadedArgs = new Map<string, PreloadedArgs>()
+
+const AD_WAIT_TIME_MS = 30_000
 const CHECK_TAB_POLLING_MS = 1_000
 
 export type CheckoutResult =
@@ -18,16 +26,24 @@ export type CheckoutResult =
   | { status: 'closed' }
 
 export const GamingUI = {
-  show: async () => {
-    if (!activeModal) {
+  showPreload: async (id: string) => {
+    const arg = preloadedArgs.get(id)
+    if (!arg) {
       return
     }
-    activeModal.showModal()
+    // Remove from map to avoid showing it again
+    preloadedArgs.delete(id)
+
+    if (activeModal) {
+      activeModal.remove()
+    }
+    activeModal = arg.element
+    arg.element.showModal()
     document.body.classList.add('bolt-no-scroll')
 
-    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = activeModalOptions || {}
+    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = arg.options
 
-    const counter = activeModal.querySelector('#banner-counter')!
+    const counter = arg.element.querySelector('#banner-counter')!
     await new Promise<void>(resolve => {
       let remainingSec = Math.ceil(timeoutMs / 1000)
       // It would be more precise to make it recursive with requestAnimationFrame and Date,
@@ -49,32 +65,25 @@ export const GamingUI = {
     claimRewardButton.id = 'claim-reward-button'
     claimRewardButton.textContent = 'Claim Reward'
     claimRewardButton.onclick = () => {
-      activeModal?.remove()
+      arg.element?.remove()
+      preloadedArgs.delete(id)
       activeModal = null
-      activeModalOptions = null
       document.body.classList.remove('bolt-no-scroll')
 
       // Wait for the modal to be fully removed before calling onClaim
       setTimeout(() => onClaim?.())
     }
-    activeModal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
+    arg.element.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
   },
 
-  openAdInIframe: async (
-    url: string,
-    options: AdOptions = {}
-  ): Promise<void> => {
-    if (activeModal) {
-      activeModal.remove()
-    }
-
+  preloadAdInIframe: (url: string, options: AdOptions = {}): string => {
     const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
     const timeoutSec = Math.ceil(timeoutMs / 1_000)
 
     // Create modal elements
-    activeModal = document.createElement('dialog')
-    activeModal.id = 'bolt-modal-container-ads'
-    activeModal.innerHTML = `
+    const modal = document.createElement('dialog')
+    modal.id = 'bolt-modal-container-ads'
+    modal.innerHTML = `
         <div id="bolt-ad-banner">
           <div id="banner-counter">${timeoutSec}</div>
         </div>
@@ -82,36 +91,39 @@ export const GamingUI = {
     `
 
     // disable closing the modal by clicking outside or pressing Esc
-    activeModal.addEventListener('cancel', event => {
+    modal.addEventListener('cancel', event => {
       event.preventDefault()
     })
 
-    document.body.appendChild(activeModal)
+    document.body.appendChild(modal)
     applyModalStyles()
 
-    activeModalOptions = options
+    const id = `bolt-modal-${Math.random().toString(36).slice(2)}`
+    preloadedArgs.set(id, { options, element: modal })
+    return id
   },
 
   checkoutInIframe: (url: string): Promise<CheckoutResult> => {
     return new Promise(resolve => {
+      // Remove any existing active modal before showing checkout
       if (activeModal) {
         activeModal.remove()
       }
 
-      let iframeUrl = new URL(url);
-      iframeUrl.searchParams.set("window_location", window.location.toString());
-      const iframeSrc = iframeUrl.toString();
+      const iframeUrl = new URL(url)
+      iframeUrl.searchParams.set('window_location', window.location.toString())
+      const iframeSrc = iframeUrl.toString()
 
       // Create modal elements
-      activeModal = document.createElement('div')
-      activeModal.id = 'bolt-modal-overlay'
+      activeModal = document.createElement('dialog')
+      activeModal.id = 'bolt-modal-container'
       activeModal.innerHTML = `
-        <div id="bolt-modal-container">
-          <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
-        </div>
+        <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
       `
       document.body.appendChild(activeModal)
       applyModalStyles()
+
+      activeModal.showModal()
 
       // Close logic
       const closeModal = (result: CheckoutResult = { status: 'closed' }) => {
