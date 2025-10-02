@@ -7,9 +7,10 @@ import {
 
 import css from './ui.css?raw'
 
-let activeModal: HTMLDivElement | null = null
+let activeModal: HTMLDialogElement | null = null
+let activeModalOptions: AdOptions | null = null
 
-const AD_WAIT_TIME_MS = 3_000
+const AD_WAIT_TIME_MS = 10_000
 const CHECK_TAB_POLLING_MS = 1_000
 
 export type CheckoutResult =
@@ -17,30 +18,14 @@ export type CheckoutResult =
   | { status: 'closed' }
 
 export const GamingUI = {
-  openAdInIframe: async (
-    url: string,
-    options: AdOptions = {}
-  ): Promise<void> => {
-    if (activeModal) {
-      activeModal.remove()
+  show: async () => {
+    if (!activeModal) {
+      return
     }
+    activeModal.showModal()
+    document.body.classList.add('bolt-no-scroll')
 
-    const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
-    const timeoutSec = Math.ceil(timeoutMs / 1_000)
-
-    // Create modal elements
-    activeModal = document.createElement('div')
-    activeModal.id = 'bolt-modal-overlay'
-    activeModal.innerHTML = `
-      <div id="bolt-modal-container-ads">
-        <div id="bolt-ad-banner">
-          <div id="banner-counter">${timeoutSec}</div>
-        </div>
-        <iframe src="${url}" id="bolt-iframe-modal"></iframe>
-      </div>
-    `
-    document.body.appendChild(activeModal)
-    applyModalStyles()
+    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = activeModalOptions || {}
 
     const counter = activeModal.querySelector('#banner-counter')!
     await new Promise<void>(resolve => {
@@ -65,10 +50,46 @@ export const GamingUI = {
     claimRewardButton.textContent = 'Claim Reward'
     claimRewardButton.onclick = () => {
       activeModal?.remove()
+      activeModal = null
+      activeModalOptions = null
+      document.body.classList.remove('bolt-no-scroll')
 
-      setTimeout(() => options.onClaim?.())
+      // Wait for the modal to be fully removed before calling onClaim
+      setTimeout(() => onClaim?.())
     }
     activeModal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
+  },
+
+  openAdInIframe: async (
+    url: string,
+    options: AdOptions = {}
+  ): Promise<void> => {
+    if (activeModal) {
+      activeModal.remove()
+    }
+
+    const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
+    const timeoutSec = Math.ceil(timeoutMs / 1_000)
+
+    // Create modal elements
+    activeModal = document.createElement('dialog')
+    activeModal.id = 'bolt-modal-container-ads'
+    activeModal.innerHTML = `
+        <div id="bolt-ad-banner">
+          <div id="banner-counter">${timeoutSec}</div>
+        </div>
+        <iframe src="${url}" id="bolt-iframe-modal"></iframe>
+    `
+
+    // disable closing the modal by clicking outside or pressing Esc
+    activeModal.addEventListener('cancel', event => {
+      event.preventDefault()
+    })
+
+    document.body.appendChild(activeModal)
+    applyModalStyles()
+
+    activeModalOptions = options
   },
 
   checkoutInIframe: (url: string): Promise<CheckoutResult> => {

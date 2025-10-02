@@ -24,6 +24,7 @@ export interface GamingNamespace {
   resolveSession: (
     response: GetPaymentLinkResponse
   ) => PaymentLinkSession | undefined
+  show: () => void
 }
 
 export function createGamingNamespace(
@@ -31,6 +32,9 @@ export function createGamingNamespace(
   getConfig: () => BoltConfig
 ): GamingNamespace {
   return {
+    show: () => {
+      GamingUI.show()
+    },
     async openCheckout(
       checkoutLink: string,
       options: OpenCheckoutOptions = { target: 'iframe' }

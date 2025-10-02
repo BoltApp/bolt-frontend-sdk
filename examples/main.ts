@@ -99,16 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
 
+  BoltSDK.gaming.openAd(
+    'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
+    {
+      onClaim: () => {
+        alert('success!')
+      },
+    }
+  )
+
   advertisementButton?.addEventListener('click', async () => {
     appendLog('Opening advertisement...', 'info')
 
-    BoltSDK.gaming.openAd(
-      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
-      {
-        onClaim: () => {
-          alert('success!')
-        },
-      }
-    )
+    BoltSDK.gaming.show()
   })
 })
