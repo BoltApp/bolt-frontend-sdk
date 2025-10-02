@@ -11,6 +11,7 @@ BoltSDK.initialize({
 document.addEventListener('DOMContentLoaded', () => {
   const checkoutButton = document.getElementById('bolt-charge-button')
   const resolveButton = document.getElementById('resolve-pending')
+  const advertisementButton = document.getElementById('advertisement-button')
   const logDiv = document.getElementById('log')!
 
   const appendLog = (
@@ -96,5 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
         )
       }
     }
+  })
+
+  advertisementButton?.addEventListener('click', async () => {
+    appendLog('Opening advertisement...', 'info')
+
+    BoltSDK.gaming.openAd(
+      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
+      {
+        onClaim: () => {
+          alert('success!')
+        },
+      }
+    )
   })
 })

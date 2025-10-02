@@ -183,6 +183,73 @@ const handlePayment = async () => {
 </script>
 ```
 
+#### Advertisement Integration
+
+The SDK also provides support for displaying advertisements to users:
+
+```ts
+import { BoltSDK } from '@boltpay/bolt-js'
+
+// Open an advertisement with an optional callback when claimed
+BoltSDK.gaming.openAd('https://your-ad-link.com', {
+  onClaim: () => {
+    console.log('Ad reward claimed!')
+    // Update game state or provide rewards
+  },
+})
+```
+
+#### React Example with Advertisements
+
+```tsx
+import { BoltSDK } from '@boltpay/bolt-js'
+
+function AdButton({ adLink }: { adLink: string }) {
+  const handleAdDisplay = async () => {
+    await BoltSDK.gaming.openAd(adLink, {
+      onClaim: () => {
+        // Handle reward claim
+        console.log('Reward claimed!')
+      },
+    })
+  }
+
+  return <button onClick={handleAdDisplay}>Watch Ad</button>
+}
+```
+
+#### Vue Example with Advertisements
+
+```vue
+<template>
+  <button @click="handleAdDisplay" :disabled="loading">
+    {{ loading ? 'Loading...' : 'Watch Ad' }}
+  </button>
+</template>
+
+<script setup>
+import { ref } from 'vue'
+import { BoltSDK } from '@boltpay/bolt-js'
+
+const props = defineProps(['adLink'])
+const loading = ref(false)
+
+const handleAdDisplay = async () => {
+  loading.value = true
+  try {
+    await BoltSDK.gaming.openAd(props.adLink, {
+      onClaim: () => {
+        // Handle reward claim
+        console.log('Reward claimed!')
+      },
+    })
+  } finally {
+    loading.value = false
+  }
+}
+</script>
+```
+
 ## Need help?
 
 <div class="discord-link">
