@@ -11,6 +11,7 @@
   box-sizing: content-box;
   display: flex;
   flex-direction: column;
+  height: max(800px, 90vh);
   padding: 0;
 }
 
@@ -28,8 +29,6 @@
 }
 
 #bolt-modal-container-ads {
-  aspect-ratio: 9 / 16;
-  height: max(800px, 90vh);
   margin: auto;
   width: clamp(800px, 90%, 1200px);
 }

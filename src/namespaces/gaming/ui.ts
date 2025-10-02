@@ -8,9 +8,11 @@ import {
 import css from './ui.css?raw'
 
 let activeModal: HTMLDialogElement | null = null
-let activeModalOptions: AdOptions | null = null
+// let activeModalOptions: AdOptions | null = null
 
-const AD_WAIT_TIME_MS = 10_000
+const preloadOptions = new Map<string, AdOptions>()
+
+const AD_WAIT_TIME_MS = 30_000
 const CHECK_TAB_POLLING_MS = 1_000
 
 export type CheckoutResult =
@@ -18,14 +20,16 @@ export type CheckoutResult =
   | { status: 'closed' }
 
 export const GamingUI = {
-  show: async () => {
+  showPreload: async (id: string) => {
     if (!activeModal) {
       return
     }
     activeModal.showModal()
     document.body.classList.add('bolt-no-scroll')
 
-    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = activeModalOptions || {}
+    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = preloadOptions.has(id)
+      ? preloadOptions.get(id)!
+      : {}
 
     const counter = activeModal.querySelector('#banner-counter')!
     await new Promise<void>(resolve => {
@@ -51,7 +55,7 @@ export const GamingUI = {
     claimRewardButton.onclick = () => {
       activeModal?.remove()
       activeModal = null
-      activeModalOptions = null
+      preloadOptions.delete(id)
       document.body.classList.remove('bolt-no-scroll')
 
       // Wait for the modal to be fully removed before calling onClaim
@@ -60,10 +64,7 @@ export const GamingUI = {
     activeModal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
   },
 
-  openAdInIframe: async (
-    url: string,
-    options: AdOptions = {}
-  ): Promise<void> => {
+  preloadAdInIframe: (url: string, options: AdOptions = {}): string => {
     if (activeModal) {
       activeModal.remove()
     }
@@ -89,7 +90,9 @@ export const GamingUI = {
     document.body.appendChild(activeModal)
     applyModalStyles()
 
-    activeModalOptions = options
+    const id = `bolt-modal-${Math.random().toString(36).slice(2)}`
+    preloadOptions.set(id, options)
+    return id
   },
 
   checkoutInIframe: (url: string): Promise<CheckoutResult> => {
@@ -98,20 +101,20 @@ export const GamingUI = {
         activeModal.remove()
       }
 
-      let iframeUrl = new URL(url);
-      iframeUrl.searchParams.set("window_location", window.location.toString());
-      const iframeSrc = iframeUrl.toString();
+      const iframeUrl = new URL(url)
+      iframeUrl.searchParams.set('window_location', window.location.toString())
+      const iframeSrc = iframeUrl.toString()
 
       // Create modal elements
-      activeModal = document.createElement('div')
-      activeModal.id = 'bolt-modal-overlay'
+      activeModal = document.createElement('dialog')
+      activeModal.id = 'bolt-modal-container'
       activeModal.innerHTML = `
-        <div id="bolt-modal-container">
-          <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
-        </div>
+        <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
       `
       document.body.appendChild(activeModal)
       applyModalStyles()
+
+      activeModal.showModal()
 
       // Close logic
       const closeModal = (result: CheckoutResult = { status: 'closed' }) => {
