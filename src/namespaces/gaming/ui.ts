@@ -77,9 +77,9 @@ export const GamingUI = {
         activeModal.remove()
       }
 
-      let iframeUrl = new URL(url);
-      iframeUrl.searchParams.set("window_location", window.location.toString());
-      const iframeSrc = iframeUrl.toString();
+      const iframeUrl = new URL(url)
+      iframeUrl.searchParams.set('window_location', window.location.toString())
+      const iframeSrc = iframeUrl.toString()
 
       // Create modal elements
       activeModal = document.createElement('div')
