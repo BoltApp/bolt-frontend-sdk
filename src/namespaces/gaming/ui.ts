@@ -12,20 +12,65 @@ let activeModal: HTMLDialogElement | null = null
 type PreloadedArgs = {
   options: AdOptions
   element: HTMLDialogElement
+  createdAt: number
 }
 
 // Should we limit the size of this map to avoid performance issues?
 // Multiple iframes can be preloaded, but only one modal can be active at a time
 const preloadedArgs = new Map<string, PreloadedArgs>()
+const MAX_PRELOADED_ADS = 5 // Limit to prevent memory leaks
 
 const AD_WAIT_TIME_MS = 30_000
 const CHECK_TAB_POLLING_MS = 1_000
+const PRELOAD_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 
 export type CheckoutResult =
   | { status: 'success'; payload: BoltTransactionSuccess }
   | { status: 'closed' }
 
 export const GamingUI = {
+  /**
+   * Removes expired preloaded ads from memory to prevent memory leaks.
+   * Called automatically during preloading, but can be called manually as needed.
+   */
+  cleanupExpired: () => {
+    const now = Date.now()
+    const expiredKeys: string[] = []
+
+    preloadedArgs.forEach((args, id) => {
+      if (now - args.createdAt > PRELOAD_EXPIRY_MS) {
+        args.element.remove()
+        expiredKeys.push(id)
+      }
+    })
+
+    expiredKeys.forEach(id => preloadedArgs.delete(id))
+  },
+
+  /**
+   * Cleans up all preloaded ads and active modals.
+   * Call this when your application is shutting down or navigating away.
+   */
+  cleanup: () => {
+    preloadedArgs.forEach(args => {
+      args.element.remove()
+    })
+    preloadedArgs.clear()
+
+    if (activeModal) {
+      activeModal.remove()
+      activeModal = null
+    }
+
+    document.body.classList.remove('bolt-no-scroll')
+
+    // Remove injected styles
+    const styleElement = document.getElementById('bolt-iframe-styles')
+    if (styleElement) {
+      styleElement.remove()
+    }
+  },
+
   showPreload: async (id: string) => {
     const arg = preloadedArgs.get(id)
     if (!arg) {
@@ -77,6 +122,16 @@ export const GamingUI = {
   },
 
   preloadAdInIframe: (url: string, options: AdOptions = {}): string => {
+    GamingUI.cleanupExpired()
+
+    if (preloadedArgs.size >= MAX_PRELOADED_ADS) {
+      const firstKey = preloadedArgs.keys().next().value
+      if (firstKey) {
+        preloadedArgs.get(firstKey)?.element.remove()
+        preloadedArgs.delete(firstKey)
+      }
+    }
+
     const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
     const timeoutSec = Math.ceil(timeoutMs / 1_000)
 
@@ -99,7 +154,7 @@ export const GamingUI = {
     applyModalStyles()
 
     const id = `bolt-modal-${Math.random().toString(36).slice(2)}`
-    preloadedArgs.set(id, { options, element: modal })
+    preloadedArgs.set(id, { options, element: modal, createdAt: Date.now() })
     return id
   },
 

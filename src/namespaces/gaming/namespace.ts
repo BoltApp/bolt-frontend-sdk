@@ -25,6 +25,8 @@ export interface GamingNamespace {
     response: GetPaymentLinkResponse
   ) => PaymentLinkSession | undefined
   showPreload: (id: string) => Promise<void>
+  cleanup: () => void
+  cleanupExpired: () => void
 }
 
 export function createGamingNamespace(
@@ -33,6 +35,8 @@ export function createGamingNamespace(
 ): GamingNamespace {
   return {
     showPreload: GamingUI.showPreload,
+    cleanup: GamingUI.cleanup,
+    cleanupExpired: GamingUI.cleanupExpired,
 
     async openCheckout(
       checkoutLink: string,

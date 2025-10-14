@@ -109,7 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     )
   }
-  let id = preloadAd()
+
+  let id: string | undefined = undefined
+  requestIdleCallback(() => {
+    id = preloadAd()
+  })
 
   advertisementButton?.addEventListener('click', async () => {
     appendLog('Opening advertisement...', 'info')
