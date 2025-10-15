@@ -13,6 +13,7 @@ type PreloadedArgs = {
   options: AdOptions
   element: HTMLDialogElement
   createdAt: number
+  start: () => void
 }
 
 // Should we limit the size of this map to avoid performance issues?
@@ -27,6 +28,71 @@ const PRELOAD_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 export type CheckoutResult =
   | { status: 'success'; payload: BoltTransactionSuccess }
   | { status: 'closed' }
+
+// Utility functions for common operations
+function generateModalId(): string {
+  return `bolt-modal-${Math.random().toString(36).slice(2)}`
+}
+
+function createModal(id: string, innerHTML: string): HTMLDialogElement {
+  const modal = document.createElement('dialog')
+  modal.id = id
+  modal.innerHTML = innerHTML
+  document.body.appendChild(modal)
+  applyModalStyles()
+
+  // Disable closing the modal by clicking outside or pressing Esc
+  modal.addEventListener('cancel', event => {
+    event.preventDefault()
+  })
+
+  return modal
+}
+
+function createClaimRewardButton(
+  options: AdOptions,
+  modal: HTMLDialogElement,
+  id: string
+): HTMLButtonElement {
+  const claimRewardButton = document.createElement('button')
+  claimRewardButton.id = 'claim-reward-button'
+  claimRewardButton.textContent = 'Claim Reward'
+  claimRewardButton.onclick = () => {
+    cleanupModal(modal, id)
+    // Wait for the modal to be fully removed before calling onClaim
+    setTimeout(() => options.onClaim?.())
+  }
+  return claimRewardButton
+}
+
+function cleanupModal(modal: HTMLDialogElement, id?: string): void {
+  modal?.remove()
+  if (id) {
+    preloadedArgs.delete(id)
+  }
+  activeModal = null
+  document.body.classList.remove('bolt-no-scroll')
+}
+
+function createTransactionMessageHandler(
+  url: string,
+  onSuccess: (payload: BoltTransactionSuccess) => void,
+  onClose: () => void
+): (event: MessageEvent) => void {
+  return function handleMessage(event: MessageEvent) {
+    if (event.data?.type == null) {
+      return
+    }
+    const iframeOrigin = new URL(url).origin
+    if (isBoltTransactionSuccessEvent(event.data)) {
+      window.postMessage({ type: 'bolt-charge-succeeded' }, iframeOrigin)
+      onSuccess(event.data.payload)
+    } else if (isBoltCloseEvent(event.data)) {
+      window.postMessage({ type: 'bolt-charge-closed' }, iframeOrigin)
+      onClose()
+    }
+  }
+}
 
 export const GamingUI = {
   /**
@@ -82,46 +148,17 @@ export const GamingUI = {
     if (activeModal) {
       activeModal.remove()
     }
+
     activeModal = arg.element
     arg.element.showModal()
+    arg.start()
     document.body.classList.add('bolt-no-scroll')
-
-    const { timeoutMs = AD_WAIT_TIME_MS, onClaim } = arg.options
-
-    const counter = arg.element.querySelector('#banner-counter')!
-    await new Promise<void>(resolve => {
-      let remainingSec = Math.ceil(timeoutMs / 1000)
-      // It would be more precise to make it recursive with requestAnimationFrame and Date,
-      // but this is good enough for a countdown timer.
-      const interval = setInterval(() => {
-        remainingSec--
-        if (remainingSec > 0) {
-          counter.textContent = remainingSec.toString()
-        } else {
-          clearInterval(interval)
-          resolve()
-        }
-      }, 1000)
-    })
-
-    counter.remove()
-
-    const claimRewardButton = document.createElement('button')
-    claimRewardButton.id = 'claim-reward-button'
-    claimRewardButton.textContent = 'Claim Reward'
-    claimRewardButton.onclick = () => {
-      arg.element?.remove()
-      preloadedArgs.delete(id)
-      activeModal = null
-      document.body.classList.remove('bolt-no-scroll')
-
-      // Wait for the modal to be fully removed before calling onClaim
-      setTimeout(() => onClaim?.())
-    }
-    arg.element.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
   },
 
-  preloadAdInIframe: (url: string, options: AdOptions = {}): string => {
+  preloadTimedAdInIframe: (
+    url: string,
+    options: AdOptions = { type: 'timed' }
+  ): string => {
     GamingUI.cleanupExpired()
 
     if (preloadedArgs.size >= MAX_PRELOADED_ADS) {
@@ -135,26 +172,84 @@ export const GamingUI = {
     const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
     const timeoutSec = Math.ceil(timeoutMs / 1_000)
 
-    // Create modal elements
-    const modal = document.createElement('dialog')
-    modal.id = 'bolt-modal-container-ads'
-    modal.innerHTML = `
+    const id = generateModalId()
+    const modal = createModal(
+      'bolt-modal-container-ads',
+      `
         <div id="bolt-ad-banner">
           <div id="banner-counter">${timeoutSec}</div>
         </div>
         <iframe src="${url}" id="bolt-iframe-modal"></iframe>
-    `
+      `
+    )
 
-    // disable closing the modal by clicking outside or pressing Esc
-    modal.addEventListener('cancel', event => {
-      event.preventDefault()
+    async function start() {
+      const counter = modal.querySelector('#banner-counter')!
+      await new Promise<void>(resolve => {
+        let remainingSec = Math.ceil(timeoutMs / 1000)
+        // It would be more precise to make it recursive with requestAnimationFrame and Date,
+        // but this is good enough for a countdown timer.
+        const interval = setInterval(() => {
+          remainingSec--
+          if (remainingSec > 0) {
+            counter.textContent = remainingSec.toString()
+          } else {
+            clearInterval(interval)
+            resolve()
+          }
+        }, 1000)
+      })
+
+      counter.remove()
+
+      const claimRewardButton = createClaimRewardButton(options, modal, id)
+      modal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
+    }
+
+    preloadedArgs.set(id, {
+      options,
+      element: modal,
+      createdAt: Date.now(),
+      start,
     })
+    return id
+  },
 
-    document.body.appendChild(modal)
-    applyModalStyles()
+  preloadUntimedAdInIframe: (
+    adLink: string,
+    options: AdOptions = { type: 'untimed' }
+  ) => {
+    const id = generateModalId()
+    const modal = createModal(
+      'bolt-modal-container-ads',
+      `
+      <iframe src="${adLink}" id="bolt-iframe-modal"></iframe>
+      `
+    )
 
-    const id = `bolt-modal-${Math.random().toString(36).slice(2)}`
-    preloadedArgs.set(id, { options, element: modal, createdAt: Date.now() })
+    function start() {
+      function messageHandler(event: Event) {
+        console.log('Received message event:', (event as any).data?.type)
+        if (
+          event instanceof MessageEvent &&
+          event.data?.type === 'bolt-gaming-issue-reward'
+        ) {
+          cleanupModal(modal, id)
+          // Wait for the modal to be fully removed before calling onClaim
+          setTimeout(() => options.onClaim?.())
+          window.removeEventListener('message', messageHandler)
+        }
+      }
+
+      window.addEventListener('message', messageHandler)
+    }
+
+    preloadedArgs.set(id, {
+      options,
+      element: modal,
+      createdAt: Date.now(),
+      start,
+    })
     return id
   },
 
@@ -169,39 +264,28 @@ export const GamingUI = {
       iframeUrl.searchParams.set('window_location', window.location.toString())
       const iframeSrc = iframeUrl.toString()
 
-      // Create modal elements
-      activeModal = document.createElement('dialog')
-      activeModal.id = 'bolt-modal-container'
-      activeModal.innerHTML = `
+      activeModal = createModal(
+        'bolt-modal-container',
+        `
         <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
-      `
-      document.body.appendChild(activeModal)
-      applyModalStyles()
+        `
+      )
 
       activeModal.showModal()
 
       // Close logic
       const closeModal = (result: CheckoutResult = { status: 'closed' }) => {
         window.removeEventListener('message', handleMessage)
-        activeModal?.remove()
-        activeModal = null
+        cleanupModal(activeModal!)
         resolve(result)
       }
 
       // Listen for transaction success
-      function handleMessage(event: MessageEvent) {
-        if (event.data?.type == null) {
-          return
-        }
-        const iframeOrigin = new URL(url).origin
-        if (isBoltTransactionSuccessEvent(event.data)) {
-          window.postMessage({ type: 'bolt-charge-succeeded' }, iframeOrigin)
-          closeModal({ status: 'success', payload: event.data?.payload })
-        } else if (isBoltCloseEvent(event.data)) {
-          window.postMessage({ type: 'bolt-charge-closed' }, iframeOrigin)
-          closeModal({ status: 'closed' })
-        }
-      }
+      const handleMessage = createTransactionMessageHandler(
+        url,
+        payload => closeModal({ status: 'success', payload }),
+        () => closeModal({ status: 'closed' })
+      )
       window.addEventListener('message', handleMessage)
     })
   },
@@ -214,28 +298,29 @@ export const GamingUI = {
         return
       }
 
+      const cleanup = () => {
+        clearInterval(checkClosed)
+        window.removeEventListener('message', handleMessage)
+      }
+
       // Listen for messages from the new tab
-      function handleMessage(event: MessageEvent) {
-        if (event.data?.type == null) {
-          return
-        }
-        if (isBoltTransactionSuccessEvent(event.data)) {
-          clearInterval(checkClosed)
-          window.removeEventListener('message', handleMessage)
-          resolve({ status: 'success', payload: event.data?.payload })
-        } else if (isBoltCloseEvent(event.data)) {
-          clearInterval(checkClosed)
-          window.removeEventListener('message', handleMessage)
+      const handleMessage = createTransactionMessageHandler(
+        url,
+        payload => {
+          cleanup()
+          resolve({ status: 'success', payload })
+        },
+        () => {
+          cleanup()
           resolve({ status: 'closed' })
         }
-      }
+      )
       window.addEventListener('message', handleMessage)
 
       // Poll to detect when the new tab is closed
       const checkClosed = setInterval(() => {
         if (newTab.closed) {
-          clearInterval(checkClosed)
-          window.removeEventListener('message', handleMessage)
+          cleanup()
           resolve({ status: 'closed' })
         }
       }, CHECK_TAB_POLLING_MS)

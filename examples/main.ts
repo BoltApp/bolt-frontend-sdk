@@ -100,14 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   function preloadAd() {
-    return BoltSDK.gaming.preloadAd(
-      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
-      {
-        onClaim: () => {
-          alert('success!')
-        },
-      }
-    )
+    const timedUrl =
+      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd'
+    // untimed test requires local working ad site
+    // const untimedUrl = 'http://localhost:5173/'
+
+    return BoltSDK.gaming.preloadAd(timedUrl, {
+      type: 'timed',
+      onClaim: () => {
+        alert('success!')
+      },
+    })
   }
 
   let id: string | undefined = undefined

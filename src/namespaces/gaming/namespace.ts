@@ -14,12 +14,17 @@ type OpenCheckoutOptions = {
   target?: 'iframe' | 'newTab' // Default: 'iframe'
 }
 
+type OpenAdResult =
+  | { status: 'success'; data: { adLink: string } }
+  | { status: 'error'; error: string }
+
 export interface GamingNamespace {
   openCheckout: (
     checkoutLink: string,
     options?: OpenCheckoutOptions
   ) => Promise<PaymentLinkSession | undefined>
   preloadAd: (adLink: string, options?: AdOptions) => string | void
+  openAd: (adLink: string, options?: AdOptions) => Promise<OpenAdResult>
   getPendingSessions: () => PaymentLinkSession[]
   resolveSession: (
     response: GetPaymentLinkResponse
@@ -92,35 +97,28 @@ export function createGamingNamespace(
       }
     },
 
-    preloadAd: (adLink, options = {}) => {
+    preloadAd,
+
+    openAd: async (adLink, options = { type: 'timed' }) => {
       try {
-        if (!adLink) {
-          logger.error('Advertisement link cannot be null or empty')
-          return
+        const id = preloadAd(adLink, options)
+        if (!id) {
+          return { status: 'error', error: 'Failed to preload ad' }
         }
 
-        logger.info(`Opening ad link: ${adLink}`)
-        eventEmitter.emit('ad-opened', { adLink })
-
-        const id = GamingUI.preloadAdInIframe(adLink, options)
-
-        eventEmitter.emit('ad-completed', { adLink })
-        logger.info(`Ad completed: ${adLink}`)
-
-        return id
+        await GamingUI.showPreload(id)
+        return { status: 'success', data: { adLink } }
       } catch (ex) {
         logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
-        throw ex
+        return { status: 'error', error: String(ex) }
       }
     },
 
-    getPendingSessions(): PaymentLinkSession[] {
+    getPendingSessions() {
       return PaymentLinkSessions.getAllByStatus('pending')
     },
 
-    resolveSession(
-      response: GetPaymentLinkResponse
-    ): PaymentLinkSession | undefined {
+    resolveSession(response) {
       const session = PaymentLinkSessions.getById(response.payment_link.id)
       const newStatus = sessionStatusFromTransaction(response.transaction)
       if (session) {
@@ -139,6 +137,39 @@ export function createGamingNamespace(
       }
       return session
     },
+  }
+
+  function preloadAd(adLink: string, options: AdOptions = { type: 'timed' }) {
+    try {
+      if (!adLink) {
+        logger.error('Advertisement link cannot be null or empty')
+        return undefined
+      }
+
+      logger.info(`Opening ad link: ${adLink}`)
+      eventEmitter.emit('ad-opened', { adLink })
+
+      let id: string
+      switch (options.type) {
+        case 'timed':
+          id = GamingUI.preloadTimedAdInIframe(adLink, options)
+          break
+        case 'untimed':
+          id = GamingUI.preloadUntimedAdInIframe(adLink, options)
+          break
+        default:
+          throw new Error(`Unsupported ad type: ${options.type}`)
+      }
+
+      eventEmitter.emit('ad-completed', { adLink })
+      logger.info(`Ad completed: ${adLink}`)
+
+      return id
+      // return { status: 'success', data: { adLink } }
+    } catch (ex) {
+      logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
+      throw ex
+    }
   }
 }
 
