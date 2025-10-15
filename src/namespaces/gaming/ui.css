@@ -1,26 +1,22 @@
-#bolt-modal-overlay {
-  align-items: center;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: 9999;
+.bolt-no-scroll {
+  overflow: hidden;
 }
 
 #bolt-modal-container,
 #bolt-modal-container-ads {
   background: #fff;
   border-radius: 10px;
+  border-width: 0;
   box-shadow: 0 2px 24px rgba(254, 243, 243, 0.2);
   box-sizing: content-box;
   display: flex;
   flex-direction: column;
+  height: max(800px, 90vh);
+  padding: 0;
+}
 
-  position: fixed;
+#bolt-modal-container-ads::backdrop {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 #bolt-modal-container {
@@ -33,9 +29,14 @@
 }
 
 #bolt-modal-container-ads {
-  aspect-ratio: 9 / 16;
-  height: 90vh;
-  margin: 20px;
+  margin: auto;
+  width: clamp(800px, 90%, 1200px);
+}
+
+@media (max-height: 800px) {
+  #bolt-modal-container-ads {
+    height: 100vh;
+  }
 }
 
 #bolt-iframe-modal {

@@ -19,11 +19,14 @@ export interface GamingNamespace {
     checkoutLink: string,
     options?: OpenCheckoutOptions
   ) => Promise<PaymentLinkSession | undefined>
-  openAd: (adLink: string, options?: AdOptions) => Promise<void>
+  preloadAd: (adLink: string, options?: AdOptions) => string | void
   getPendingSessions: () => PaymentLinkSession[]
   resolveSession: (
     response: GetPaymentLinkResponse
   ) => PaymentLinkSession | undefined
+  showPreload: (id: string) => Promise<void>
+  cleanup: () => void
+  cleanupExpired: () => void
 }
 
 export function createGamingNamespace(
@@ -31,6 +34,10 @@ export function createGamingNamespace(
   getConfig: () => BoltConfig
 ): GamingNamespace {
   return {
+    showPreload: GamingUI.showPreload,
+    cleanup: GamingUI.cleanup,
+    cleanupExpired: GamingUI.cleanupExpired,
+
     async openCheckout(
       checkoutLink: string,
       options: OpenCheckoutOptions = { target: 'iframe' }
@@ -85,7 +92,7 @@ export function createGamingNamespace(
       }
     },
 
-    openAd: async (adLink: string, options: AdOptions = {}): Promise<void> => {
+    preloadAd: (adLink, options = {}) => {
       try {
         if (!adLink) {
           logger.error('Advertisement link cannot be null or empty')
@@ -95,10 +102,12 @@ export function createGamingNamespace(
         logger.info(`Opening ad link: ${adLink}`)
         eventEmitter.emit('ad-opened', { adLink })
 
-        await GamingUI.openAdInIframe(adLink, options)
+        const id = GamingUI.preloadAdInIframe(adLink, options)
 
         eventEmitter.emit('ad-completed', { adLink })
         logger.info(`Ad completed: ${adLink}`)
+
+        return id
       } catch (ex) {
         logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
         throw ex
