@@ -8,7 +8,7 @@ import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
 import { GamingUI } from './ui'
 import type { GetPaymentLinkResponse } from '@/types/endpoints'
-import { AdOptions } from '@/types/ads'
+import { AdOptions, PreloadedAd } from '@/types/ads'
 
 type OpenCheckoutOptions = {
   target?: 'iframe' | 'newTab' // Default: 'iframe'
@@ -17,10 +17,6 @@ type OpenCheckoutOptions = {
 type OpenAdResult =
   | { status: 'success'; data: { adLink: string } }
   | { status: 'error'; error: string }
-
-type PreloadedAd = {
-  show: () => Promise<void>
-}
 
 export interface GamingNamespace {
   openCheckout: (

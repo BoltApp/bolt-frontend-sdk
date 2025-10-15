@@ -15,4 +15,6 @@ export type {
   CreatePaymentLinkResponse,
 } from './types/endpoints'
 
+export type { PreloadedAd, AdOptions } from './types/ads'
+
 export const BoltSDK = createBoltSDK()
