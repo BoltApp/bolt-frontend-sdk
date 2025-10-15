@@ -15,7 +15,7 @@ import {
  * Main implementation of the Bolt Frontend SDK
  */
 export type BoltSDKType = {
-  initialize: (initArgs?: InitArgs) => void
+  initialize: (initArgs?: InitArgs) => Promise<void>
   on: <T extends BoltAction['type']>(
     eventName: T,
     listener: (data: Extract<BoltAction, { type: T }>['payload']) => void
@@ -29,7 +29,7 @@ export function createBoltSDK(): BoltSDKType {
   let config: BoltConfig
 
   return {
-    initialize(initArgs?: InitArgs) {
+    async initialize(initArgs?: InitArgs) {
       config = new BoltConfig(initArgs)
     },
 
