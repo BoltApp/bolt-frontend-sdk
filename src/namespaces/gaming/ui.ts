@@ -140,7 +140,7 @@ export const GamingUI = {
   showPreload: async (id: string) => {
     const arg = preloadedArgs.get(id)
     if (!arg) {
-      return
+      throw new Error(`Preloaded ad with id '${id}' not found or already used`)
     }
     // Remove from map to avoid showing it again
     preloadedArgs.delete(id)

@@ -113,19 +113,19 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   }
 
-  let id: string | undefined = undefined
+  let preloadedAd: ReturnType<typeof BoltSDK.gaming.preloadAd> = undefined
   requestIdleCallback(() => {
-    id = preloadAd()
+    preloadedAd = preloadAd()
   })
 
   advertisementButton?.addEventListener('click', async () => {
     appendLog('Opening advertisement...', 'info')
 
-    if (id != null) {
-      await BoltSDK.gaming.showPreload(id)
+    if (preloadedAd != null) {
+      await preloadedAd.show()
       appendLog('Advertisement completed!', 'success')
 
-      id = preloadAd()
+      preloadedAd = preloadAd()
     }
   })
 })

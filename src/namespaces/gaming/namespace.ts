@@ -18,18 +18,21 @@ type OpenAdResult =
   | { status: 'success'; data: { adLink: string } }
   | { status: 'error'; error: string }
 
+type PreloadedAd = {
+  show: () => Promise<void>
+}
+
 export interface GamingNamespace {
   openCheckout: (
     checkoutLink: string,
     options?: OpenCheckoutOptions
   ) => Promise<PaymentLinkSession | undefined>
-  preloadAd: (adLink: string, options?: AdOptions) => string | void
+  preloadAd: (adLink: string, options?: AdOptions) => PreloadedAd | undefined
   openAd: (adLink: string, options?: AdOptions) => Promise<OpenAdResult>
   getPendingSessions: () => PaymentLinkSession[]
   resolveSession: (
     response: GetPaymentLinkResponse
   ) => PaymentLinkSession | undefined
-  showPreload: (id: string) => Promise<void>
   cleanup: () => void
   cleanupExpired: () => void
 }
@@ -39,7 +42,6 @@ export function createGamingNamespace(
   getConfig: () => BoltConfig
 ): GamingNamespace {
   return {
-    showPreload: GamingUI.showPreload,
     cleanup: GamingUI.cleanup,
     cleanupExpired: GamingUI.cleanupExpired,
 
@@ -101,12 +103,12 @@ export function createGamingNamespace(
 
     openAd: async (adLink, options = { type: 'timed' }) => {
       try {
-        const id = preloadAd(adLink, options)
-        if (!id) {
+        const preloadedAd = preloadAd(adLink, options)
+        if (!preloadedAd) {
           return { status: 'error', error: 'Failed to preload ad' }
         }
 
-        await GamingUI.showPreload(id)
+        await preloadedAd.show()
         return { status: 'success', data: { adLink } }
       } catch (ex) {
         logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
@@ -139,7 +141,10 @@ export function createGamingNamespace(
     },
   }
 
-  function preloadAd(adLink: string, options: AdOptions = { type: 'timed' }) {
+  function preloadAd(
+    adLink: string,
+    options: AdOptions = { type: 'timed' }
+  ): PreloadedAd | undefined {
     try {
       if (!adLink) {
         logger.error('Advertisement link cannot be null or empty')
@@ -164,8 +169,11 @@ export function createGamingNamespace(
       eventEmitter.emit('ad-completed', { adLink })
       logger.info(`Ad completed: ${adLink}`)
 
-      return id
-      // return { status: 'success', data: { adLink } }
+      return {
+        show: async () => {
+          await GamingUI.showPreload(id)
+        },
+      }
     } catch (ex) {
       logger.error(`Failed to open advertisement link '${adLink}': ${ex}`)
       throw ex
