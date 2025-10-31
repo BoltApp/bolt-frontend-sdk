@@ -110,7 +110,7 @@ yarn add @boltpay/bolt-js
 The SDK comes with an sample webpage with a basic form of all the different integrations. With your package manager of choice just install and run dev to see it in your browser.
 
 ```bash
-npm run install
+npm install
 npm run dev
 ```
 
