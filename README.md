@@ -105,6 +105,15 @@ bun install @boltpay/bolt-js
 yarn add @boltpay/bolt-js
 ```
 
+#### Optional: Run the SDK locally
+
+The SDK comes with an sample webpage with a basic form of all the different integrations. With your package manager of choice just install and run dev to see it in your browser.
+
+```bash
+npm run install
+npm run dev
+```
+
 ### Step 2: Add code to your game
 
 There is a sample integration in the `examples/` folder.

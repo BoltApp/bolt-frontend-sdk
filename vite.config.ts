@@ -10,7 +10,7 @@ const fileName = {
 
 const formats = Object.keys(fileName) as Array<keyof typeof fileName>
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '')
 
@@ -18,9 +18,18 @@ export default defineConfig(({ mode }) => {
   const serverPort = parseInt(env.SERVER_PORT || '3001', 10)
   console.log(`Client running on port: ${clientPort}`)
 
+  const isServe = command === 'serve'
+
   return {
     base: './',
     envPrefix: 'BOLT_',
+    // When running `vite dev`, serve the example app at examples/index.html
+    // Keep library build settings for `vite build`
+    ...(isServe
+      ? {
+          root: path.resolve(__dirname, 'examples'),
+        }
+      : {}),
     build: {
       outDir: './build/dist',
       lib: {
