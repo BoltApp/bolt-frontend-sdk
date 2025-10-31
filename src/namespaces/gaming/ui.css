@@ -4,7 +4,7 @@
 
 #bolt-modal-container,
 #bolt-modal-container-ads {
-  background: #fff;
+  background: transparent;
   border-radius: 10px;
   border-width: 0;
   box-shadow: 0 2px 24px rgba(254, 243, 243, 0.2);
@@ -19,7 +19,7 @@
 }
 
 #bolt-modal-container-ads::backdrop {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.85);
 }
 
 #bolt-modal-container {
