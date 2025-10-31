@@ -232,7 +232,8 @@ export const GamingUI = {
         console.log('Received message event:', (event as any).data?.type)
         if (
           event instanceof MessageEvent &&
-          event.data?.type === 'bolt-gaming-issue-reward'
+          (event.data?.type === 'bolt-gaming-issue-reward' ||
+            event.data?.type === 'toffee_redeem')
         ) {
           cleanupModal(modal, id)
           // Wait for the modal to be fully removed before calling onClaim

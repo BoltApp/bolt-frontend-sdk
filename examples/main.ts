@@ -101,12 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function preloadAd() {
     const timedUrl =
-      'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd'
+      'https://show.sandbox.toffee.com/offer_01k8xfgg310hxn8tayjwv9be57'
     // untimed test requires local working ad site
     // const untimedUrl = 'http://localhost:5173/'
 
     return BoltSDK.gaming.preloadAd(timedUrl, {
-      type: 'timed',
+      type: 'untimed',
       onClaim: () => {
         alert('success!')
       },
