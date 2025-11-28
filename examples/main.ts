@@ -100,17 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   function preloadAd() {
-    const timedUrl =
-      'https://show.sandbox.toffee.com/offer_01k956sqp9rjemay9n4edjar96'
+    // const timedPayload = [
+    //   'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
+    //   { type: 'timed', onClaim: () => alert('Timed ad success!') },
+    // ] as const
     // untimed test requires local working ad site
-    // const untimedUrl = 'http://localhost:5173/'
+    const untimedPayload = [
+      'http://localhost:5173/',
+      { type: 'untimed', onClaim: () => alert('Untimed ad success!') },
+    ] as const
 
-    return BoltSDK.gaming.preloadAd(timedUrl, {
-      type: 'untimed',
-      onClaim: () => {
-        alert('success!')
-      },
-    })
+    return BoltSDK.gaming.preloadAd(...untimedPayload)
   }
 
   let preloadedAd: ReturnType<typeof BoltSDK.gaming.preloadAd> = undefined

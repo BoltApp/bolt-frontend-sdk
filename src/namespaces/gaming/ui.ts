@@ -4,6 +4,7 @@ import {
   isBoltCloseEvent,
   isBoltTransactionSuccessEvent,
 } from '../../types/transaction'
+import { createEventCoordinator } from '../../utils/event-coordinator'
 
 import css from './ui.css?raw'
 
@@ -78,19 +79,34 @@ function createTransactionMessageHandler(
   url: string,
   onSuccess: (payload: BoltTransactionSuccess) => void,
   onClose: () => void
-): (event: MessageEvent) => void {
-  return function handleMessage(event: MessageEvent) {
-    if (event.data?.type == null) {
-      return
-    }
-    const iframeOrigin = new URL(url).origin
-    if (isBoltTransactionSuccessEvent(event.data)) {
-      window.postMessage({ type: 'bolt-charge-succeeded' }, iframeOrigin)
-      onSuccess(event.data.payload)
-    } else if (isBoltCloseEvent(event.data)) {
-      window.postMessage({ type: 'bolt-charge-closed' }, iframeOrigin)
-      onClose()
-    }
+) {
+  const coordinator = createEventCoordinator({
+    origin: new URL(url).origin,
+  })
+
+  return {
+    coordinator,
+    setupListeners: () => {
+      // Note: These events are not standard bolt events, so we handle them differently
+      const handleMessage = (event: MessageEvent) => {
+        if (event.data?.type == null) {
+          return
+        }
+        if (isBoltTransactionSuccessEvent(event.data)) {
+          coordinator.postMessage('bolt-charge-succeeded' as any)
+          onSuccess(event.data.payload)
+        } else if (isBoltCloseEvent(event.data)) {
+          coordinator.postMessage('bolt-charge-closed' as any)
+          onClose()
+        }
+      }
+
+      window.addEventListener('message', handleMessage)
+      return () => {
+        window.removeEventListener('message', handleMessage)
+        coordinator.destroy()
+      }
+    },
   }
 }
 
@@ -226,24 +242,50 @@ export const GamingUI = {
       <iframe src="${adLink}" id="bolt-iframe-modal"></iframe>
       `
     )
+    function getIframe() {
+      return modal.querySelector('#bolt-iframe-modal') as HTMLIFrameElement
+    }
+
+    const iframeCoordinator = createEventCoordinator({
+      postTarget: getIframe(),
+      origin: new URL(adLink).origin,
+    })
 
     function start() {
-      function messageHandler(event: Event) {
-        console.log('Received message event:', (event as any).data?.type)
-        if (
-          event instanceof MessageEvent &&
-          (event.data?.type === 'bolt-gaming-issue-reward' ||
-            event.data?.type === 'toffee_redeem')
-        ) {
-          cleanupModal(modal, id)
-          // Wait for the modal to be fully removed before calling onClaim
-          setTimeout(() => options.onClaim?.())
-          window.removeEventListener('message', messageHandler)
-        }
-      }
+      const issueRewardHandler = event => {
+        console.log('Received bolt-gaming-issue-reward event:', event)
+        cleanupModal(modal, id)
+        boltUnsubscribe()
+        toffeeUnsubscribe()
+        iframeCoordinator.destroy()
 
-      window.addEventListener('message', messageHandler)
+        // Wait for the modal to be fully removed before calling onClaim
+        setTimeout(() => options.onClaim?.())
+      }
+      const boltUnsubscribe = iframeCoordinator.addEventListener(
+        'bolt-gaming-issue-reward',
+        issueRewardHandler
+      )
+      const toffeeUnsubscribe = iframeCoordinator.addEventListener(
+        'toffee_redeem',
+        issueRewardHandler
+      )
+
+      iframeCoordinator.postMessage('bolt-gaming-start-ads')
     }
+
+    // Ensure the iframe is loaded before sending messages
+    // After a certain timeout, the ad provider may not respond. Do not show iframe.
+    getIframe().addEventListener('load', () => {
+      const unsubscribe = iframeCoordinator.addEventListener(
+        'bolt-gaming-page-loaded',
+        event => {
+          console.log('Page loaded event received:', event)
+          // Page loaded, ready for interaction
+          unsubscribe()
+        }
+      )
+    })
 
     preloadedArgs.set(id, {
       options,
@@ -276,18 +318,18 @@ export const GamingUI = {
 
       // Close logic
       const closeModal = (result: CheckoutResult = { status: 'closed' }) => {
-        window.removeEventListener('message', handleMessage)
+        cleanup()
         cleanupModal(activeModal!)
         resolve(result)
       }
 
       // Listen for transaction success
-      const handleMessage = createTransactionMessageHandler(
+      const messageHandler = createTransactionMessageHandler(
         url,
         payload => closeModal({ status: 'success', payload }),
         () => closeModal({ status: 'closed' })
       )
-      window.addEventListener('message', handleMessage)
+      const cleanup = messageHandler.setupListeners()
     })
   },
 
@@ -299,13 +341,15 @@ export const GamingUI = {
         return
       }
 
+      let messageCleanup: (() => void) | null = null
+
       const cleanup = () => {
         clearInterval(checkClosed)
-        window.removeEventListener('message', handleMessage)
+        messageCleanup?.()
       }
 
       // Listen for messages from the new tab
-      const handleMessage = createTransactionMessageHandler(
+      const messageHandler = createTransactionMessageHandler(
         url,
         payload => {
           cleanup()
@@ -316,7 +360,7 @@ export const GamingUI = {
           resolve({ status: 'closed' })
         }
       )
-      window.addEventListener('message', handleMessage)
+      messageCleanup = messageHandler.setupListeners()
 
       // Poll to detect when the new tab is closed
       const checkClosed = setInterval(() => {
