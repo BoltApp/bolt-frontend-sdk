@@ -251,41 +251,34 @@ export const GamingUI = {
       origin: new URL(adLink).origin,
     })
 
-    function start() {
-      const issueRewardHandler = event => {
+    // Ensure the iframe is loaded before sending messages
+    // After a certain timeout, the ad provider may not respond. Do not show iframe.
+    const pageLoadedPromise = new Promise<void>(resolve => {
+      getIframe().addEventListener('load', () => resolve())
+    }).then(() => iframeCoordinator.waitForEvent('bolt-gaming-page-loaded'))
+
+    async function start() {
+      await pageLoadedPromise
+
+      // Set up listener for reward event
+      const boltRewardPromise = iframeCoordinator.waitForEvent(
+        'bolt-gaming-issue-reward'
+      )
+      const toffeeRewardPromise =
+        iframeCoordinator.waitForEvent('toffee_redeem')
+
+      Promise.race([boltRewardPromise, toffeeRewardPromise]).then(event => {
         console.log('Received bolt-gaming-issue-reward event:', event)
         cleanupModal(modal, id)
-        boltUnsubscribe()
-        toffeeUnsubscribe()
         iframeCoordinator.destroy()
 
         // Wait for the modal to be fully removed before calling onClaim
         setTimeout(() => options.onClaim?.())
-      }
-      const boltUnsubscribe = iframeCoordinator.addEventListener(
-        'bolt-gaming-issue-reward',
-        issueRewardHandler
-      )
-      const toffeeUnsubscribe = iframeCoordinator.addEventListener(
-        'toffee_redeem',
-        issueRewardHandler
-      )
+      })
 
+      console.log('Sending start ads message to iframe')
       iframeCoordinator.postMessage('bolt-gaming-start-ads')
     }
-
-    // Ensure the iframe is loaded before sending messages
-    // After a certain timeout, the ad provider may not respond. Do not show iframe.
-    getIframe().addEventListener('load', () => {
-      const unsubscribe = iframeCoordinator.addEventListener(
-        'bolt-gaming-page-loaded',
-        event => {
-          console.log('Page loaded event received:', event)
-          // Page loaded, ready for interaction
-          unsubscribe()
-        }
-      )
-    })
 
     preloadedArgs.set(id, {
       options,

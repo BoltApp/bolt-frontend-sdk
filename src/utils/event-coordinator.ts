@@ -29,6 +29,9 @@ type EventCoordinator = {
     type: T,
     handler: BoltEventHandler<T>
   ) => void
+  waitForEvent: <T extends BoltEventType>(
+    type: T
+  ) => Promise<BoltEventMessage<T>>
   getProcessedCount(): number
   destroy(): void
 }
@@ -210,6 +213,21 @@ export function createEventCoordinator(options?: {
   }
 
   /**
+   * Wait for a specific event type to occur once
+   * Returns a Promise that resolves with the event data when the event is first received
+   */
+  function waitForEvent<T extends BoltEventType>(
+    type: T
+  ): Promise<BoltEventMessage<T>> {
+    return new Promise(resolve => {
+      const unsubscribe = addEventListener(type, event => {
+        unsubscribe()
+        resolve(event)
+      })
+    })
+  }
+
+  /**
    * Get processed message count (for debugging)
    */
   function getProcessedCount(): number {
@@ -237,6 +255,7 @@ export function createEventCoordinator(options?: {
     postMessage,
     addEventListener,
     removeEventListener,
+    waitForEvent,
     getProcessedCount,
     destroy,
   }
