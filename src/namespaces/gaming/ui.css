@@ -11,6 +11,8 @@
   box-sizing: content-box;
   flex-direction: column;
   height: max(800px, 90vh);
+  max-height: 100vh; /* override dialog defaults */
+  max-width: 100vw; /* override dialog defaults */
   padding: 0;
 }
 
@@ -84,4 +86,14 @@
   padding: 8px 16px;
   text-align: center;
   text-decoration: none;
+}
+
+@media (max-width: 500px) {
+  #bolt-modal-container,
+  #bolt-modal-container-ads {
+    border-radius: 0;
+    height: 100vh;
+    margin: 0;
+    width: 100vw;
+  }
 }
