@@ -253,12 +253,14 @@ export const GamingUI = {
 
     // Ensure the iframe is loaded before sending messages
     // After a certain timeout, the ad provider may not respond. Do not show iframe.
-    const pageLoadedPromise = new Promise<void>(resolve => {
-      getIframe().addEventListener('load', () => resolve())
-    }).then(() => iframeCoordinator.waitForEvent('bolt-gaming-page-loaded'))
+    const pageLoadedPromise = iframeCoordinator.waitForEvent(
+      'bolt-gaming-page-loaded'
+    )
 
     async function start() {
       await pageLoadedPromise
+
+      iframeCoordinator.postMessage('bolt-gaming-start-ads')
 
       // Set up listener for reward event
       const boltRewardPromise = iframeCoordinator.waitForEvent(
@@ -275,9 +277,6 @@ export const GamingUI = {
         // Wait for the modal to be fully removed before calling onClaim
         setTimeout(() => options.onClaim?.())
       })
-
-      console.log('Sending start ads message to iframe')
-      iframeCoordinator.postMessage('bolt-gaming-start-ads')
     }
 
     preloadedArgs.set(id, {
