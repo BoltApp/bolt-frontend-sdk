@@ -4,6 +4,7 @@ export interface GetPaymentLinkRequest {
     price: number
     name: string
     currency: string
+    image_url: string
   }
   redirect_url: string
   user_id: string
@@ -12,7 +13,7 @@ export interface GetPaymentLinkRequest {
 }
 
 export interface GetPaymentLinkResponse {
-  payment_link: GetPaymentLinkRequest
+  payment_link_properties: GetPaymentLinkRequest
   transaction?: {
     reference: string
     status:
@@ -31,6 +32,7 @@ export interface CreatePaymentLinkRequest {
     price: number
     name: string
     currency: string
+    image_url: string
   }
   redirect_url: string
   user_id: string
