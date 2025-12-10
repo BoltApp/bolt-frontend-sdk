@@ -2,7 +2,7 @@
   "name": "@boltpay/bolt-js",
   "private": false,
   "description": "BoltJS connects your frontend to the Bolt ecosystem",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "license": "MIT",
   "author": "Bolt",
   "module": "./build/dist/bolt.js",
