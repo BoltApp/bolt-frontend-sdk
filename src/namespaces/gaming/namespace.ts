@@ -117,7 +117,9 @@ export function createGamingNamespace(
     },
 
     resolveSession(response) {
-      const session = PaymentLinkSessions.getById(response.payment_link.id)
+      const session = PaymentLinkSessions.getById(
+        response.payment_link_properties.id
+      )
       const newStatus = sessionStatusFromTransaction(response.transaction)
       if (session) {
         if (session.status !== newStatus) {
@@ -130,7 +132,7 @@ export function createGamingNamespace(
         }
       } else {
         logger.error(
-          `Failed to resolve payment link session. Session not found for id: ${response.payment_link.id}`
+          `Failed to resolve payment link session. Session not found for id: ${response.payment_link_properties.id}`
         )
       }
       return session
