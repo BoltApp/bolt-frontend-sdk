@@ -58,8 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     appendLog('Generating payment link...', 'info')
 
     try {
-      const paymentLink = await generatePaymentLink()
+      let paymentLink = await generatePaymentLink()
       console.log('Generated Payment Link:', paymentLink)
+
+      // Default to static payment link if server is not running
+      if (!paymentLink?.link) {
+        appendLog('Error generating link. Defaulting to static link.', 'error')
+        paymentLink = {
+          id: 'sess_01jzqtzq8w2c0t6jdhx23z3nmz',
+          link: 'https://sandbox.pay.toffeepay.com/sess_01k1e48z43rd63873qf4e7vt5f',
+        }
+      }
 
       appendLog('Opening checkout...', 'info')
 
@@ -106,7 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ] as const
     // untimed test requires local working ad site
     const untimedPayload = [
-      'http://localhost:5173/',
+      'https://show.sandbox.toffee.com/offer_01kcj1rtbn51gz3febancratkb',
       { type: 'untimed', onClaim: () => alert('Untimed ad success!') },
     ] as const
 

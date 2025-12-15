@@ -118,7 +118,7 @@ export function createGamingNamespace(
 
     resolveSession(response) {
       const session = PaymentLinkSessions.getById(
-        response.payment_link_properties.id
+        response?.payment_link_properties?.id
       )
       const newStatus = sessionStatusFromTransaction(response.transaction)
       if (session) {

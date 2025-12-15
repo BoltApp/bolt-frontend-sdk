@@ -7,7 +7,6 @@
   background: transparent;
   border-radius: 10px;
   border-width: 0;
-  box-shadow: 0 2px 24px rgba(254, 243, 243, 0.2);
   box-sizing: content-box;
   flex-direction: column;
   height: max(800px, 90vh);
