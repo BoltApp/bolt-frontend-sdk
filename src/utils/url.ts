@@ -7,19 +7,25 @@ import { BoltUser } from '@/namespaces/user/types'
 export const UrlUtils = {
   buildCheckoutLink(baseUrl: string, config: BoltConfig, boltUser: BoltUser) {
     const url = new URL(baseUrl)
-    const params = new URLSearchParams(url.search)
 
     for (const [key, value] of Object.entries(boltUser)) {
-      params.set(key, value)
+      url.searchParams.set(key, value)
     }
 
     // Add game id and publishable key
-    if (!params.has('game_id')) {
-      params.set('game_id', config.gameId)
+    if (!url.searchParams.has('game_id')) {
+      url.searchParams.set('game_id', config.gameId)
     }
 
-    if (!params.has('publishable_key')) {
-      params.set('publishable_key', config.publishableKey)
+    if (!url.searchParams.has('publishable_key')) {
+      url.searchParams.set('publishable_key', config.publishableKey)
+    }
+
+    if (!url.searchParams.has('payment_link_id')) {
+      if (baseUrl.includes('sess_')) {
+        const sessionId = baseUrl.split('sess_')[1]
+        url.searchParams.set('payment_link_id', sessionId)
+      }
     }
 
     return url

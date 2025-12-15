@@ -32,7 +32,7 @@ export interface CreatePaymentLinkRequest {
     price: number
     name: string
     currency: string
-    image_url: string
+    image_url?: string
   }
   redirect_url: string
   user_id: string

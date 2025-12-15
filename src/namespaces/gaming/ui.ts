@@ -258,7 +258,10 @@ export const GamingUI = {
     )
 
     async function start() {
-      await pageLoadedPromise
+      const isBoltDomain = !adLink.includes('toffee')
+      if (isBoltDomain) {
+        await pageLoadedPromise
+      }
 
       iframeCoordinator.postMessage('bolt-gaming-start-ads')
 

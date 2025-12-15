@@ -7,7 +7,6 @@
   background: transparent;
   border-radius: 10px;
   border-width: 0;
-  box-shadow: 0 2px 24px rgba(254, 243, 243, 0.2);
   box-sizing: content-box;
   flex-direction: column;
   height: max(800px, 90vh);
@@ -90,7 +89,7 @@
   text-decoration: none;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
   #bolt-modal-container,
   #bolt-modal-container-ads {
     border-radius: 0;
