@@ -90,7 +90,7 @@
   text-decoration: none;
 }
 
-@media (max-width: 500px) {
+@media (max-width: 768px) {
   #bolt-modal-container,
   #bolt-modal-container-ads {
     border-radius: 0;
