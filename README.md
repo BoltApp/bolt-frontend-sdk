@@ -4,7 +4,7 @@
 
 ## What is this?
 
-Native JavaScript/TypeScript support for Bolt Web Payments. A programmatic way for out-of-app purchases and subscriptions.
+Native JavaScript/TypeScript support for Bolt Web Payments. A programmatic way to provide out-of-app purchases and subscriptions.
 
 We also support other platforms:
 
