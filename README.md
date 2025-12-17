@@ -4,7 +4,7 @@
 
 ## What is this?
 
-Native JavaScript/TypeScript support support for Bolt Web Payments. A programmatic way to for out-of-app purchases and subscriptions.
+Native JavaScript/TypeScript support for Bolt Web Payments. A programmatic way to provide out-of-app purchases and subscriptions.
 
 We also support other platforms:
 
@@ -61,10 +61,10 @@ For documentation and API reference visit our [quick start guide](https://bolt-g
 
 ## 💰 Why Bolt
 
-Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with using Bolt.
+Only with Bolt do you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with Bolt.
 
 <p style="font-size:12px;font-style:italic;opacity:85%">
-<strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
+<strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up-to-date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
 </p>
 
 ## 🛠️ Prerequisites
