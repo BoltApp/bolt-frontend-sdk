@@ -258,17 +258,11 @@ export const GamingUI = {
     )
 
     async function start() {
-      const isBoltDomain = !adLink.includes('toffee')
-      if (isBoltDomain) {
-        await pageLoadedPromise
-      }
+      const boltRewardPromise = pageLoadedPromise.then(() => {
+        iframeCoordinator.postMessage('bolt-gaming-start-ads')
+        return iframeCoordinator.waitForEvent('bolt-gaming-issue-reward')
+      })
 
-      iframeCoordinator.postMessage('bolt-gaming-start-ads')
-
-      // Set up listener for reward event
-      const boltRewardPromise = iframeCoordinator.waitForEvent(
-        'bolt-gaming-issue-reward'
-      )
       const toffeeRewardPromise =
         iframeCoordinator.waitForEvent('toffee_redeem')
 
