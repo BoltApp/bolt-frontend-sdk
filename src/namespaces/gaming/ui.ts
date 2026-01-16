@@ -43,8 +43,10 @@ function createModal(id: string, innerHTML: string): HTMLDialogElement {
   applyModalStyles()
 
   // Disable closing the modal by clicking outside or pressing Esc
-  modal.addEventListener('cancel', event => {
-    event.preventDefault()
+  modal.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+    }
   })
 
   return modal
