@@ -20,9 +20,7 @@ type PreloadedArgs = {
 // Should we limit the size of this map to avoid performance issues?
 // Multiple iframes can be preloaded, but only one modal can be active at a time
 const preloadedArgs = new Map<string, PreloadedArgs>()
-const MAX_PRELOADED_ADS = 5 // Limit to prevent memory leaks
 
-const AD_WAIT_TIME_MS = 30_000
 const CHECK_TAB_POLLING_MS = 1_000
 const PRELOAD_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 
@@ -50,22 +48,6 @@ function createModal(id: string, innerHTML: string): HTMLDialogElement {
   })
 
   return modal
-}
-
-function createClaimRewardButton(
-  options: AdOptions,
-  modal: HTMLDialogElement,
-  id: string
-): HTMLButtonElement {
-  const claimRewardButton = document.createElement('button')
-  claimRewardButton.id = 'claim-reward-button'
-  claimRewardButton.textContent = 'Claim Reward'
-  claimRewardButton.onclick = () => {
-    cleanupModal(modal, id)
-    // Wait for the modal to be fully removed before calling onClaim
-    setTimeout(() => options.onClaim?.())
-  }
-  return claimRewardButton
 }
 
 function cleanupModal(modal: HTMLDialogElement, id?: string): void {
@@ -173,70 +155,7 @@ export const GamingUI = {
     document.body.classList.add('bolt-no-scroll')
   },
 
-  preloadTimedAdInIframe: (
-    url: string,
-    options: AdOptions = { type: 'timed' }
-  ): string => {
-    GamingUI.cleanupExpired()
-
-    if (preloadedArgs.size >= MAX_PRELOADED_ADS) {
-      const firstKey = preloadedArgs.keys().next().value
-      if (firstKey) {
-        preloadedArgs.get(firstKey)?.element.remove()
-        preloadedArgs.delete(firstKey)
-      }
-    }
-
-    const timeoutMs = options.timeoutMs ?? AD_WAIT_TIME_MS
-    const timeoutSec = Math.ceil(timeoutMs / 1_000)
-
-    const id = generateModalId()
-    const modal = createModal(
-      'bolt-modal-container-ads',
-      `
-        <div id="bolt-ad-banner">
-          <div id="banner-counter">${timeoutSec}</div>
-        </div>
-        <iframe src="${url}" id="bolt-iframe-modal"></iframe>
-      `
-    )
-
-    async function start() {
-      const counter = modal.querySelector('#banner-counter')!
-      await new Promise<void>(resolve => {
-        let remainingSec = Math.ceil(timeoutMs / 1000)
-        // It would be more precise to make it recursive with requestAnimationFrame and Date,
-        // but this is good enough for a countdown timer.
-        const interval = setInterval(() => {
-          remainingSec--
-          if (remainingSec > 0) {
-            counter.textContent = remainingSec.toString()
-          } else {
-            clearInterval(interval)
-            resolve()
-          }
-        }, 1000)
-      })
-
-      counter.remove()
-
-      const claimRewardButton = createClaimRewardButton(options, modal, id)
-      modal.querySelector('#bolt-ad-banner')?.appendChild(claimRewardButton)
-    }
-
-    preloadedArgs.set(id, {
-      options,
-      element: modal,
-      createdAt: Date.now(),
-      start,
-    })
-    return id
-  },
-
-  preloadUntimedAdInIframe: (
-    adLink: string,
-    options: AdOptions = { type: 'untimed' }
-  ) => {
+  preloadAdInIframe: (adLink: string, options: AdOptions) => {
     const id = generateModalId()
     const modal = createModal(
       'bolt-modal-container-ads',

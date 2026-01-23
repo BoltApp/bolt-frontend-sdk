@@ -5,7 +5,7 @@ import { generatePaymentLink, getPaymentLink } from './bolt'
 BoltSDK.initialize({
   gameId: 'com.knights-of-valor.game',
   publishableKey: import.meta.env.BOLT_PUBLISHABLE_KEY,
-  environment: 'Development',
+  environment: 'development',
 })
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -109,17 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
   })
 
   function preloadAd() {
-    // const timedPayload = [
-    //   'https://show.sandbox.toffee.com/offer_01k5y8wdbk5b390mmwdz5ja7cd',
-    //   { type: 'timed', onClaim: () => alert('Timed ad success!') },
-    // ] as const
-    // untimed test requires local working ad site
-    const untimedPayload = [
-      'https://show.sandbox.toffee.com/offer_01kcj1rtbn51gz3febancratkb',
-      { type: 'untimed', onClaim: () => alert('Untimed ad success!') },
-    ] as const
-
-    return BoltSDK.gaming.preloadAd(...untimedPayload)
+    return BoltSDK.gaming.preloadAd({
+      onClaim: () => alert('Ad success!'),
+    })
   }
 
   let preloadedAd: ReturnType<typeof BoltSDK.gaming.preloadAd> = undefined

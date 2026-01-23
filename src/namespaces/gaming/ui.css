@@ -48,7 +48,6 @@
   }
 }
 
-/* For timed, the radius must only be for the bottom */
 #bolt-iframe-modal {
   border: 0;
   border-radius: 10px;
@@ -57,39 +56,4 @@
   margin: auto;
   max-width: 480px;
   width: 100%;
-}
-
-#bolt-ad-banner {
-  background: #fff;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  color: #000;
-  display: grid;
-  font-size: 16px;
-  grid-template-areas: 'x action counter';
-  grid-template-columns: 1fr auto 1fr;
-  height: 40px;
-  padding: 4px 16px;
-}
-
-#banner-counter {
-  align-items: center;
-  display: flex;
-  font-weight: bold;
-  grid-area: counter;
-  justify-content: end;
-}
-
-#claim-reward-button {
-  background-color: #4caf50;
-  border: 0;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 16px;
-  grid-area: action;
-  margin: 0;
-  padding: 8px 16px;
-  text-align: center;
-  text-decoration: none;
 }
