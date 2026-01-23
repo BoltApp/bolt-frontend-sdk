@@ -4,4 +4,4 @@ export interface InitArgs {
   environment?: Environment
 }
 
-export type Environment = 'Development' | 'Staging' | 'Production'
+export type Environment = 'development' | 'staging' | 'sandbox' | 'production'

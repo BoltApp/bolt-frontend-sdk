@@ -11,16 +11,18 @@ export class BoltConfig {
   constructor(initArgs: InitArgs = {}) {
     this.gameId = initArgs.gameId ?? 'com.bolt.typescript.test'
     this.publishableKey = initArgs.publishableKey ?? 'found_in.bolt.dashboard'
-    this.environment = initArgs.environment ?? 'Development'
+    this.environment = initArgs.environment ?? 'production'
   }
 
   public getEnvironmentDisplayName(): string {
     switch (this.environment) {
-      case 'Development':
+      case 'development':
         return 'Development'
-      case 'Staging':
+      case 'staging':
         return 'Staging'
-      case 'Production':
+      case 'sandbox':
+        return 'Sandbox'
+      case 'production':
         return 'Production'
       default:
         return 'Unknown'
@@ -28,14 +30,27 @@ export class BoltConfig {
   }
 
   public isProduction(): boolean {
-    return this.environment === 'Production'
+    return this.environment === 'production'
   }
 
   public isDevelopment(): boolean {
-    return this.environment === 'Development'
+    return this.environment === 'development'
   }
 
   public isStaging(): boolean {
-    return this.environment === 'Staging'
+    return this.environment === 'staging'
+  }
+
+  public getAdUrl(): string {
+    switch (this.environment) {
+      case 'development':
+      case 'staging':
+        return 'https://play.staging-bolt.com'
+      case 'sandbox':
+        return 'https://play.sandbox-bolt.com'
+      case 'production':
+      default:
+        return 'https://play.bolt.com'
+    }
   }
 }

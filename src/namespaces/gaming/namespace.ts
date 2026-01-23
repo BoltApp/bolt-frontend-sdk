@@ -23,8 +23,8 @@ export interface GamingNamespace {
     checkoutLink: string,
     options?: OpenCheckoutOptions
   ) => Promise<PaymentLinkSession | undefined>
-  preloadAd: (adLink: string, options?: AdOptions) => PreloadedAd | undefined
-  openAd: (adLink: string, options?: AdOptions) => Promise<OpenAdResult>
+  preloadAd: (options?: AdOptions) => PreloadedAd | undefined
+  openAd: (options?: AdOptions) => Promise<OpenAdResult>
   getPendingSessions: () => PaymentLinkSession[]
   resolveSession: (
     response: GetPaymentLinkResponse
@@ -97,9 +97,12 @@ export function createGamingNamespace(
 
     preloadAd,
 
-    openAd: async (adLink, options = { type: 'timed' }) => {
+    openAd: async (options = {}) => {
+      const config = getConfig()
+      const adLink = config.getAdUrl()
+
       try {
-        const preloadedAd = preloadAd(adLink, options)
+        const preloadedAd = preloadAd(options)
         if (!preloadedAd) {
           return { status: 'error', error: 'Failed to preload ad' }
         }
@@ -139,30 +142,15 @@ export function createGamingNamespace(
     },
   }
 
-  function preloadAd(
-    adLink: string,
-    options: AdOptions = { type: 'timed' }
-  ): PreloadedAd | undefined {
-    try {
-      if (!adLink) {
-        logger.error('Advertisement link cannot be null or empty')
-        return undefined
-      }
+  function preloadAd(options: AdOptions = {}): PreloadedAd | undefined {
+    const config = getConfig()
+    const adLink = config.getAdUrl()
 
+    try {
       logger.info(`Opening ad link: ${adLink}`)
       eventEmitter.emit('ad-opened', { adLink })
 
-      let id: string
-      switch (options.type) {
-        case 'timed':
-          id = GamingUI.preloadTimedAdInIframe(adLink, options)
-          break
-        case 'untimed':
-          id = GamingUI.preloadUntimedAdInIframe(adLink, options)
-          break
-        default:
-          throw new Error(`Unsupported ad type: ${options.type}`)
-      }
+      const id = GamingUI.preloadAdInIframe(adLink, options)
 
       eventEmitter.emit('ad-completed', { adLink })
       logger.info(`Ad completed: ${adLink}`)
