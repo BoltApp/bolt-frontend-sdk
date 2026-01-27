@@ -1,14 +1,17 @@
+import type { GetPaymentLinkResponse } from '@/types/endpoints'
+import { AdOptions, PreloadedAd } from '@/types/ads'
+import { DeviceUtils } from '@/utils/device'
+
 import { BoltConfig } from '../../config'
 import { EventEmitter } from '../../utils/event-emitter'
 import { logger } from '../../utils/logger'
 import { PaymentLinkSessions } from './sessions'
-import type { PaymentLinkSession, PaymentLinkStatus } from './types'
 import { UrlUtils } from '../../utils/url'
 import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
+
+import type { PaymentLinkSession, PaymentLinkStatus } from './types'
 import { GamingUI } from './ui'
-import type { GetPaymentLinkResponse } from '@/types/endpoints'
-import { AdOptions, PreloadedAd } from '@/types/ads'
 
 type OpenCheckoutOptions = {
   target?: 'iframe' | 'newTab' // Default: 'iframe'
@@ -145,15 +148,20 @@ export function createGamingNamespace(
   function preloadAd(options: AdOptions = {}): PreloadedAd | undefined {
     const config = getConfig()
     const adLink = config.getAdUrl()
+    const queryParams = new URLSearchParams({
+      publishable_key: config.publishableKey,
+      client_device_id: DeviceUtils.getDeviceId(),
+    })
+    const adUrl = `${adLink}?${queryParams.toString()}`
 
     try {
-      logger.info(`Opening ad link: ${adLink}`)
+      logger.info(`Opening ad link: ${adUrl}`)
       eventEmitter.emit('ad-opened', { adLink })
 
-      const id = GamingUI.preloadAdInIframe(adLink, options)
+      const id = GamingUI.preloadAdInIframe(adUrl, options)
 
       eventEmitter.emit('ad-completed', { adLink })
-      logger.info(`Ad completed: ${adLink}`)
+      logger.info(`Ad completed: ${adUrl}`)
 
       return {
         show: async () => {
