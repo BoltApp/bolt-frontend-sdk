@@ -160,7 +160,7 @@ export const GamingUI = {
     const modal = createModal(
       'bolt-modal-container-ads',
       `
-      <iframe src="${adLink}" id="bolt-iframe-modal"></iframe>
+      <iframe src="${adLink}" id="bolt-iframe-modal" allow="autoplay; fullscreen"></iframe>
       `
     )
     function getIframe() {
