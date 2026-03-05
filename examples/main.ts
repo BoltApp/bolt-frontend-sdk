@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appendLog('Opening advertisement...', 'info')
 
     if (preloadedAd != null) {
-      await preloadedAd.show()
+      await preloadedAd.show({ placement: 'main_menu' })
       appendLog('Advertisement completed!', 'success')
 
       preloadedAd = preloadAd()

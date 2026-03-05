@@ -10,7 +10,7 @@ import { UrlUtils } from '../../utils/url'
 import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
 
-import type { PaymentLinkSession, PaymentLinkStatus } from './types'
+import type { AdMetadata, PaymentLinkSession, PaymentLinkStatus } from './types'
 import { GamingUI } from './ui'
 
 type OpenCheckoutOptions = {
@@ -164,8 +164,8 @@ export function createGamingNamespace(
       logger.info(`Ad completed: ${adUrl}`)
 
       return {
-        show: async () => {
-          await GamingUI.showPreload(id)
+        show: async (metadata?: AdMetadata) => {
+          await GamingUI.showPreload(id, metadata)
         },
       }
     } catch (ex) {

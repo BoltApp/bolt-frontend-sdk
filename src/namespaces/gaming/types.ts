@@ -25,3 +25,15 @@ export interface PaymentLinkSessionArgs {
 export interface PaymentLinkTable {
   [id: string]: PaymentLinkSession
 }
+
+export type AdPlacement =
+  | 'main_menu'
+  | 'shop'
+  | 'game_over'
+  | 'level_complete'
+  | 'other'
+
+export interface AdMetadata {
+  placement?: AdPlacement
+  [key: string]: string | number | boolean | undefined
+}
