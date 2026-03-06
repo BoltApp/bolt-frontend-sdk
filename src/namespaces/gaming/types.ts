@@ -26,14 +26,15 @@ export interface PaymentLinkTable {
   [id: string]: PaymentLinkSession
 }
 
-export type AdPlacement =
+export type AdSurface =
   | 'main_menu'
   | 'shop'
   | 'game_over'
   | 'level_complete'
   | 'other'
+  | (string & {}) // Allow arbitrary strings for future surfaces
 
 export interface AdMetadata {
-  ad_placement?: AdPlacement
+  surface?: AdSurface
   [key: string]: string | number | boolean | undefined
 }
