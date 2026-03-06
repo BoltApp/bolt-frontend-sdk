@@ -22,6 +22,9 @@ export type BoltSDKType = {
   ) => () => void
   user: UserNamespace
   gaming: GamingNamespace
+  readonly debug: {
+    version: string
+  }
 }
 
 export function createBoltSDK(): BoltSDKType {
@@ -37,6 +40,9 @@ export function createBoltSDK(): BoltSDKType {
       return eventEmitter.on(eventName, listener)
     },
 
+    get debug() {
+      return { version: __SDK_VERSION__ }
+    },
     user: createUserNamespace(),
     gaming: createGamingNamespace(eventEmitter, () => config),
   }

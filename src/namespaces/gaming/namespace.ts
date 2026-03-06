@@ -147,10 +147,18 @@ export function createGamingNamespace(
 
   function preloadAd(options: AdOptions = {}): PreloadedAd | undefined {
     const config = getConfig()
+
+    if (config.publishableKey == null) {
+      throw new Error(
+        'Publishable key is required to preload ads. Please initialize Bolt SDK with a valid publishable key.'
+      )
+    }
+
     const adLink = config.getAdUrl()
     const queryParams = new URLSearchParams({
       publishable_key: config.publishableKey,
       client_device_id: DeviceUtils.getDeviceId(),
+      sdk: `js-${__SDK_VERSION__}`,
     })
     const adUrl = `${adLink}?${queryParams.toString()}`
 

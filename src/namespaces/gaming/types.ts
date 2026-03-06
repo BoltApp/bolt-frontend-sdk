@@ -34,6 +34,6 @@ export type AdPlacement =
   | 'other'
 
 export interface AdMetadata {
-  placement?: AdPlacement
+  ad_placement?: AdPlacement
   [key: string]: string | number | boolean | undefined
 }

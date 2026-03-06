@@ -8,6 +8,8 @@ BoltSDK.initialize({
   environment: 'development',
 })
 
+document.querySelector('#sdk-version')!.textContent = BoltSDK.debug.version
+
 document.addEventListener('DOMContentLoaded', () => {
   const checkoutButton = document.getElementById('bolt-charge-button')
   const resolveButton = document.getElementById('resolve-pending')
@@ -123,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     appendLog('Opening advertisement...', 'info')
 
     if (preloadedAd != null) {
-      await preloadedAd.show({ placement: 'main_menu' })
+      await preloadedAd.show({ ad_placement: 'main_menu' })
       appendLog('Advertisement completed!', 'success')
 
       preloadedAd = preloadAd()
