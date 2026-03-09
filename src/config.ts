@@ -5,12 +5,12 @@ import { Environment, InitArgs } from './types/config'
  */
 export class BoltConfig {
   public gameId: string
-  public publishableKey: string
+  public publishableKey: string | undefined
   public environment: Environment
 
   constructor(initArgs: InitArgs = {}) {
     this.gameId = initArgs.gameId ?? 'com.bolt.typescript.test'
-    this.publishableKey = initArgs.publishableKey ?? 'found_in.bolt.dashboard'
+    this.publishableKey = initArgs.publishableKey
     this.environment = initArgs.environment ?? 'production'
   }
 

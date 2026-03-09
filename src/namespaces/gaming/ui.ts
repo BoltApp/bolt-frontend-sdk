@@ -7,6 +7,7 @@ import {
 import { createEventCoordinator } from '../../utils/event-coordinator'
 
 import css from './ui.css?raw'
+import type { AdMetadata } from './types'
 
 let activeModal: HTMLDialogElement | null = null
 
@@ -14,7 +15,7 @@ type PreloadedArgs = {
   options: AdOptions
   element: HTMLDialogElement
   createdAt: number
-  start: () => void
+  start: (metadata?: AdMetadata) => void
 }
 
 // Should we limit the size of this map to avoid performance issues?
@@ -137,7 +138,7 @@ export const GamingUI = {
     }
   },
 
-  showPreload: async (id: string) => {
+  showPreload: async (id: string, metadata?: AdMetadata) => {
     const arg = preloadedArgs.get(id)
     if (!arg) {
       throw new Error(`Preloaded ad with id '${id}' not found or already used`)
@@ -151,7 +152,7 @@ export const GamingUI = {
 
     activeModal = arg.element
     arg.element.showModal()
-    arg.start()
+    arg.start(metadata)
     document.body.classList.add('bolt-no-scroll')
   },
 
@@ -178,9 +179,9 @@ export const GamingUI = {
       'bolt-gaming-page-loaded'
     )
 
-    async function start() {
+    async function start(metadata?: AdMetadata) {
       const boltRewardPromise = pageLoadedPromise.then(() => {
-        iframeCoordinator.postMessage('bolt-gaming-start-ads')
+        iframeCoordinator.postMessage('bolt-gaming-start-ads', { metadata })
         return iframeCoordinator.waitForEvent('bolt-gaming-issue-reward')
       })
 

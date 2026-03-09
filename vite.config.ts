@@ -3,6 +3,8 @@ import path from 'path'
 import { defineConfig } from 'vite'
 import { loadEnv } from 'vite'
 
+import packageJson from './package.json'
+
 const fileName = {
   es: `bolt.js`,
   iife: `bolt.iife.js`,
@@ -38,6 +40,12 @@ export default defineConfig(({ command, mode }) => {
         formats,
         fileName: format => fileName[format],
       },
+    },
+    define: {
+      __SDK_VERSION__: JSON.stringify(packageJson.version),
+      'import.meta.env.BOLT_PUBLISHABLE_KEY': JSON.stringify(
+        env.BOLT_PUBLISHABLE_KEY
+      ),
     },
     server: {
       open: true, // Automatically open browser

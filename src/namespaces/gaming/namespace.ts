@@ -10,7 +10,7 @@ import { UrlUtils } from '../../utils/url'
 import { UserUtils } from '../user/utils'
 import { BoltAction } from '../../types/actions'
 
-import type { PaymentLinkSession, PaymentLinkStatus } from './types'
+import type { AdMetadata, PaymentLinkSession, PaymentLinkStatus } from './types'
 import { GamingUI } from './ui'
 
 type OpenCheckoutOptions = {
@@ -147,10 +147,18 @@ export function createGamingNamespace(
 
   function preloadAd(options: AdOptions = {}): PreloadedAd | undefined {
     const config = getConfig()
+
+    if (config.publishableKey == null) {
+      throw new Error(
+        'Publishable key is required to preload ads. Please initialize Bolt SDK with a valid publishable key.'
+      )
+    }
+
     const adLink = config.getAdUrl()
     const queryParams = new URLSearchParams({
       publishable_key: config.publishableKey,
       client_device_id: DeviceUtils.getDeviceId(),
+      sdk: `js-${__SDK_VERSION__}`,
     })
     const adUrl = `${adLink}?${queryParams.toString()}`
 
@@ -164,8 +172,8 @@ export function createGamingNamespace(
       logger.info(`Ad completed: ${adUrl}`)
 
       return {
-        show: async () => {
-          await GamingUI.showPreload(id)
+        show: async (metadata?: AdMetadata) => {
+          await GamingUI.showPreload(id, metadata)
         },
       }
     } catch (ex) {
