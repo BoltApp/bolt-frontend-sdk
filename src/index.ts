@@ -1,3 +1,5 @@
+/// <reference types="./vite-env.d.ts" />
+
 import { createBoltSDK } from './bolt'
 
 export { type BoltSDKType } from './bolt'
