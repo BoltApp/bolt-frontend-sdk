@@ -158,6 +158,7 @@ export function createGamingNamespace(
     const queryParams = new URLSearchParams({
       publishable_key: config.publishableKey,
       client_device_id: DeviceUtils.getDeviceId(),
+      game_id: config.gameId,
       sdk: `js-${__SDK_VERSION__}`,
     })
     const adUrl = `${adLink}?${queryParams.toString()}`

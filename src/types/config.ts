@@ -1,6 +1,6 @@
 export interface InitArgs {
-  gameId?: string
-  publishableKey?: string
+  gameId: string
+  publishableKey: string
   environment?: Environment
 }
 
