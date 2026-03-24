@@ -9,11 +9,11 @@ import { createEventCoordinator } from '../../utils/event-coordinator'
 import css from './ui.css?raw'
 import type { AdMetadata } from './types'
 
-let activeModal: HTMLDialogElement | null = null
+let activeModal: HTMLIFrameElement | null = null
 
 type PreloadedArgs = {
   options: AdOptions
-  element: HTMLDialogElement
+  element: HTMLIFrameElement
   createdAt: number
   start: (metadata?: AdMetadata) => void
 }
@@ -34,25 +34,27 @@ function generateModalId(): string {
   return `bolt-modal-${Math.random().toString(36).slice(2)}`
 }
 
-function createModal(id: string, innerHTML: string): HTMLDialogElement {
-  const modal = document.createElement('dialog')
-  modal.id = id
-  modal.innerHTML = innerHTML
-  document.body.appendChild(modal)
+function createIframe(
+  className: string,
+  src: string,
+  allow?: string
+): HTMLIFrameElement {
+  const iframe = document.createElement('iframe')
+  iframe.className = className
+  iframe.src = src
+  iframe.title = 'Bolt ad'
+  if (allow) {
+    iframe.setAttribute('allow', allow)
+  }
+  iframe.style.display = 'none'
+  document.body.appendChild(iframe)
   applyModalStyles()
 
-  // Disable closing the modal by clicking outside or pressing Esc
-  modal.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-    }
-  })
-
-  return modal
+  return iframe
 }
 
-function cleanupModal(modal: HTMLDialogElement, id?: string): void {
-  modal?.remove()
+function cleanupIframe(iframe: HTMLIFrameElement, id?: string): void {
+  iframe?.remove()
   if (id) {
     preloadedArgs.delete(id)
   }
@@ -151,25 +153,21 @@ export const GamingUI = {
     }
 
     activeModal = arg.element
-    arg.element.showModal()
+    arg.element.style.display = 'block'
     arg.start(metadata)
     document.body.classList.add('bolt-no-scroll')
   },
 
   preloadAdInIframe: (adLink: string, options: AdOptions) => {
     const id = generateModalId()
-    const modal = createModal(
-      'bolt-modal-container-ads',
-      `
-      <iframe src="${adLink}" id="bolt-iframe-modal" allow="autoplay; fullscreen"></iframe>
-      `
+    const iframe = createIframe(
+      'bolt-iframe-modal',
+      adLink,
+      'autoplay; fullscreen'
     )
-    function getIframe() {
-      return modal.querySelector('#bolt-iframe-modal') as HTMLIFrameElement
-    }
 
     const iframeCoordinator = createEventCoordinator({
-      postTarget: getIframe(),
+      postTarget: iframe,
       origin: new URL(adLink).origin,
     })
 
@@ -190,7 +188,7 @@ export const GamingUI = {
 
       Promise.race([boltRewardPromise, toffeeRewardPromise]).then(event => {
         console.log('Received bolt-gaming-issue-reward event:', event)
-        cleanupModal(modal, id)
+        cleanupIframe(iframe, id)
         iframeCoordinator.destroy()
 
         // Wait for the modal to be fully removed before calling onClaim
@@ -200,7 +198,7 @@ export const GamingUI = {
 
     preloadedArgs.set(id, {
       options,
-      element: modal,
+      element: iframe,
       createdAt: Date.now(),
       start,
     })
@@ -218,19 +216,15 @@ export const GamingUI = {
       iframeUrl.searchParams.set('window_location', window.location.toString())
       const iframeSrc = iframeUrl.toString()
 
-      activeModal = createModal(
-        'bolt-modal-container',
-        `
-        <iframe src="${iframeSrc}" allow="payment *" id="bolt-iframe-modal"></iframe>
-        `
-      )
+      activeModal = createIframe('bolt-iframe-modal', iframeSrc, 'payment *')
 
-      activeModal.showModal()
+      activeModal.style.display = 'block'
+      document.body.classList.add('bolt-no-scroll')
 
       // Close logic
       const closeModal = (result: CheckoutResult = { status: 'closed' }) => {
         cleanup()
-        cleanupModal(activeModal!)
+        cleanupIframe(activeModal!)
         resolve(result)
       }
 
