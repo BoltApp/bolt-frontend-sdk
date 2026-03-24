@@ -2,7 +2,7 @@
   overflow: hidden;
 }
 
-#bolt-iframe-modal {
+.bolt-iframe-modal {
   background-color: transparent;
   border: 0;
   display: block;

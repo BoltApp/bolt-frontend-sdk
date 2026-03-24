@@ -35,14 +35,14 @@ function generateModalId(): string {
 }
 
 function createIframe(
-  id: string,
+  className: string,
   src: string,
   allow?: string
 ): HTMLIFrameElement {
   const iframe = document.createElement('iframe')
-  iframe.id = id
+  iframe.className = className
   iframe.src = src
-  iframe.setAttribute('allowTransparency', 'true')
+  iframe.title = 'Bolt ad'
   if (allow) {
     iframe.setAttribute('allow', allow)
   }
