@@ -50,7 +50,7 @@ export class BoltConfig {
         return 'https://play.sandbox-bolt.com'
       case 'production':
       default:
-        return 'https://play.bolt.com'
+        return 'https://play.boltapp.com'
     }
   }
 }
