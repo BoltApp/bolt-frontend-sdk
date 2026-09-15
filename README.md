@@ -127,17 +127,46 @@ You will need to bring your own backend server to complete integration.
 - [**Quick Start**](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html): View our quickstart guide to get the API running
 - [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
 
-#### TypeScript Types
+#### Initialize the SDK
 
-For TypeScript projects, the SDK provides full type definitions:
+Every call below assumes the SDK has been initialized once at startup. `initialize` throws if
+either `gameId` or `publishableKey` is missing.
 
 ```ts
-import { Charge, BoltTransactionSuccess } from '@boltpay/bolt-js'
+import { BoltSDK } from '@boltpay/bolt-js'
 
-// Transaction result type
-interface BoltTransactionSuccess {
-  reference: string // Unique transaction reference
-}
+await BoltSDK.initialize({
+  gameId: import.meta.env.BOLT_GAME_ID,
+  publishableKey: import.meta.env.BOLT_PUBLISHABLE_KEY,
+})
+```
+
+#### TypeScript Types
+
+`BoltSDK` is the package's only value export. Everything else is a type:
+
+```ts
+import type { PaymentLinkSession } from '@boltpay/bolt-js'
+
+// What `openCheckout` resolves to:
+//   paymentLinkId  string
+//   paymentLinkUrl string
+//   status         'pending' | 'successful' | 'expired' | 'abandoned'
+//   createdAt      Date
+//   updatedAt      Date
+//   completedAt    Date | undefined
+declare const session: PaymentLinkSession
+```
+
+`openCheckout` resolves when the shopper closes the checkout, not when they pay. The session it
+returns reads `abandoned` if the window was dismissed. A completed payment arrives as an event:
+
+```ts
+import { BoltSDK } from '@boltpay/bolt-js'
+
+BoltSDK.on('payment-link-succeeded', ({ session }) => {
+  console.log('Paid:', session.paymentLinkId)
+})
 ```
 
 #### Framework Integration Examples
@@ -145,7 +174,7 @@ interface BoltTransactionSuccess {
 ##### React
 
 ```tsx
-import { Charge } from '@boltpay/bolt-js'
+import { BoltSDK } from '@boltpay/bolt-js'
 import { useState } from 'react'
 
 function CheckoutButton({ checkoutUrl }: { checkoutUrl: string }) {
@@ -153,9 +182,8 @@ function CheckoutButton({ checkoutUrl }: { checkoutUrl: string }) {
 
   const handlePayment = async () => {
     setLoading(true)
-    const transaction = await Charge.checkout(checkoutUrl)
-    console.log('Payment completed:', transaction.reference)
-    // Redirect to success page or update UI
+    const session = await BoltSDK.gaming.openCheckout(checkoutUrl)
+    console.log('Checkout closed with status:', session?.status)
     setLoading(false)
   }
 
@@ -178,15 +206,15 @@ function CheckoutButton({ checkoutUrl }: { checkoutUrl: string }) {
 
 <script setup>
 import { ref } from 'vue'
-import { Charge } from '@boltpay/bolt-js'
+import { BoltSDK } from '@boltpay/bolt-js'
 
 const props = defineProps(['checkoutUrl'])
 const loading = ref(false)
 
 const handlePayment = async () => {
   loading.value = true
-  const transaction = await Charge.checkout(props.checkoutUrl)
-  console.log('Payment completed:', transaction.reference)
+  const session = await BoltSDK.gaming.openCheckout(props.checkoutUrl)
+  console.log('Checkout closed with status:', session?.status)
   loading.value = false
 }
 </script>
@@ -194,18 +222,23 @@ const handlePayment = async () => {
 
 #### Advertisement Integration
 
-The SDK also provides support for displaying advertisements to users:
+The SDK also provides support for displaying advertisements to users. `openAd` resolves the ad to
+show from the `gameId` you initialized with, so it takes options only:
 
 ```ts
 import { BoltSDK } from '@boltpay/bolt-js'
 
 // Open an advertisement with an optional callback when claimed
-BoltSDK.gaming.openAd('https://your-ad-link.com', {
+const result = await BoltSDK.gaming.openAd({
   onClaim: () => {
     console.log('Ad reward claimed!')
     // Update game state or provide rewards
   },
 })
+
+if (result.status === 'error') {
+  console.error('Ad failed to open:', result.error)
+}
 ```
 
 #### React Example with Advertisements
@@ -213,9 +246,9 @@ BoltSDK.gaming.openAd('https://your-ad-link.com', {
 ```tsx
 import { BoltSDK } from '@boltpay/bolt-js'
 
-function AdButton({ adLink }: { adLink: string }) {
+function AdButton() {
   const handleAdDisplay = async () => {
-    await BoltSDK.gaming.openAd(adLink, {
+    await BoltSDK.gaming.openAd({
       onClaim: () => {
         // Handle reward claim
         console.log('Reward claimed!')
@@ -240,13 +273,12 @@ function AdButton({ adLink }: { adLink: string }) {
 import { ref } from 'vue'
 import { BoltSDK } from '@boltpay/bolt-js'
 
-const props = defineProps(['adLink'])
 const loading = ref(false)
 
 const handleAdDisplay = async () => {
   loading.value = true
   try {
-    await BoltSDK.gaming.openAd(props.adLink, {
+    await BoltSDK.gaming.openAd({
       onClaim: () => {
         // Handle reward claim
         console.log('Reward claimed!')
